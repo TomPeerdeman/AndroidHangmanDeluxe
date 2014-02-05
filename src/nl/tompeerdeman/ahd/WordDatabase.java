@@ -26,4 +26,16 @@ public interface WordDatabase {
 	 * @return The list of words
 	 */
 	public List<String> getWordsInLength(int maxLength, int minLength);
+	
+	/**
+	 * Insert a word into the database
+	 * 
+	 * @param word
+	 */
+	public void insertWord(String word);
+	
+	/**
+	 * @return The amount of words in the database
+	 */
+	public int getNumWords();
 }

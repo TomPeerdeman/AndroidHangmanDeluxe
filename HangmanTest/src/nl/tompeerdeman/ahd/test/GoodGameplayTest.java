@@ -35,6 +35,16 @@ public class GoodGameplayTest extends TestCase {
 			public List<String> getWordsInLength(int maxLength, int minLength) {
 				return new ArrayList<String>(Arrays.asList("Word with spaces"));
 			}
+
+			@Override
+			public void insertWord(String word) {
+				throw new RuntimeException("Insert not allowed");
+			}
+
+			@Override
+			public int getNumWords() {
+				return 1;
+			}
 			
 		};
 		
