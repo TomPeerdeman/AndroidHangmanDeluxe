@@ -30,7 +30,7 @@ public abstract class HangmanStatus implements Serializable {
 		numRevealed = 0;
 		
 		for(int i = 0; i < numCharacters; i++) {
-			guessedChars[i] = '_';
+			guessedChars[i] = GameplayDelegate.CHARACTER_UNKNOWN;
 		}
 	}
 	

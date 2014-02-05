@@ -81,10 +81,16 @@ public class GoodGameplay extends AbstractGameplayDelegate {
 					settings.getMinWordLength());
 		Collections.shuffle(words);
 		
+		String word;
+		if(words.size() > 1) {
+			word = words.get(rand.nextInt(words.size() - 1));
+		} else {
+			word = words.get(0);
+		}
+		
 		// Create a new nice status using a random word from the list.
 		HangmanGoodStatus status =
-			new HangmanGoodStatus(settings.getMaxNumGuesses(),
-					words.get(rand.nextInt(words.size() - 1)));
+			new HangmanGoodStatus(settings.getMaxNumGuesses(), word);
 		
 		// Reveal spaces if the settings say so.
 		if(settings.shouldRevealSpaces()) {

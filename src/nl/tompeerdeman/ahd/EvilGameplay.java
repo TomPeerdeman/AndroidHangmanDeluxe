@@ -170,7 +170,12 @@ public class EvilGameplay extends AbstractGameplayDelegate {
 					settings.getMinWordLength());
 		
 		// Get a random word to determine the size
-		String word = words.get(rand.nextInt(words.size() - 1));
+		String word;
+		if(words.size() > 1) {
+			word = words.get(rand.nextInt(words.size() - 1));
+		} else {
+			word = words.get(0);
+		}
 		
 		// Build equivalence class
 		char[] eqClass = new char[word.length()];
