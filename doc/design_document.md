@@ -81,7 +81,8 @@ The settings UI consists of the following settings:
 - Min word length
 - Max word length
 - Evil/normal gameplay
-- Hide non alphabetic characters (example - )
+- Hide non alphabetic characters (example - )<br />
+	This will not show the non alphabetic characters and instead replace them by the unknown letter sign (the underscore)
 
 All number settings are set using a slider.
 All settings are tiled horizontally.
