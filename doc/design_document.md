@@ -52,6 +52,39 @@ Classes/Interfaces
 	Interface that provides methods to load and save the highscore's.
 	This will be implemented using SQLite.
 
+Usert interface
+===
+#### Main game
+See [game UI](game_ui.png). This UI should always display the onboard keyboard. The time counts up and pauses if the app is paused or the settings or highhscore activity is opened. The guesses left shows the amount of guesses left vs the maximum amount of bad guesses.
+The background of the app will react on the amount af guesses left. With all guesses left the background will be green. If all guesses are used the background is red. 
+The menu contains 3 items:
+- New game
+- Settings
+- Highscore
+
+#### Highscore
+The highscore UI will have 3 tabs:
+- Overall
+- Evil
+- Normal
+
+on each of the 3 tabs a list is shown of the highscore's where each highscore contains:
+- The word to be guessed
+- The number of bad guesses
+- The time to guess the word
+
+Only the 10 best (least time) score's are shown.
+
+#### Settings
+The settings UI consists of the following settings:
+- Max number of guesses
+- Min word length
+- Max word length
+- Evil/normal gameplay
+- Hide non alphabetic characters (example - )
+
+All number settings are set using a slider.
+All settings are tiled horizontally.
 
 Style guide
 ===
