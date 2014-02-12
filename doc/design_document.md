@@ -52,7 +52,7 @@ Classes/Interfaces
 	Interface that provides methods to load and save the highscore's.
 	This will be implemented using SQLite.
 
-Usert interface
+User interface
 ===
 #### Main game
 See [game UI](game_ui.png). This UI should always display the onboard keyboard. The time counts up and pauses if the app is paused or the settings or highhscore activity is opened. The guesses left shows the amount of guesses left vs the maximum amount of bad guesses.
@@ -86,6 +86,34 @@ The settings UI consists of the following settings:
 
 All number settings are set using a slider.
 All settings are tiled horizontally.
+
+Activity flow
+===
+MainActivity.java - the activity that shows and handles the game itself.<br />
+SettingsActivity.java - the activity that shows all the settings and edit's the underlying structure so that the MainActivity can use them.<br />
+HighscoreActivity.java - shows the highscore (10 games that have been won sorted by time ASC). Has 3 subcategories (tabs), overall, normal and evil. The overall tab shows the best 10 games, wich can be either normal or evil games. The normal tab shows the best 10 normal games. Etc.<br />
+
+#### MainActivity
+The MainActivity is started when the game launches.
+When the return buton is pressed in the main activity the game is paused and put into the background.
+The main activity has a menu of 3 items:
+- New game (Starts a new game)
+- Settings (Launches the SettingsActivity)
+- Highscore (Launches the HighscoreActivity)
+
+#### SettingsActivity
+When the return buton is pressed in the settings activity the app activates the MainActivity again.
+The settings activity has a menu of 2 items:
+- Resume game (Activate the MainActivity)
+- Highscore (Launches the HighscoreActivity)
+
+#### HighscoreActivity
+When the return buton is pressed in the highscore activity the app activates the MainActivity again.
+The highscore activity has a menu of 2 items:
+- Resume game (Activate the MainActivity)
+- Settings (Launches the SettingsActivity)
+
+When the hihscore is accessed by first activating the SettingsActivity (through the menu of the MainActivity), and in this SettingsActivity the HighscoreActivity is called (through the menu of the SettingsActivity), the return button should return to the MainActivity and **not** the SettingsActivity. 
 
 Style guide
 ===
