@@ -13,6 +13,8 @@ public abstract class HangmanStatus implements Serializable {
 	protected byte guesses;
 	protected char[] guessedChars;
 	
+	protected long time;
+	
 	protected transient byte numRevealed;
 	
 	/**
@@ -64,6 +66,21 @@ public abstract class HangmanStatus implements Serializable {
 			}
 		}
 	}
+	
+	/**
+	 * @return the time
+	 */
+	public long getTime() {
+		return time;
+	}
+
+	/**
+	 * @param time the time to add
+	 */
+	public void addTime(long time) {
+		this.time += time;
+	}
+
 	
 	/**
 	 * @return True of the game has been lost, otherwise false

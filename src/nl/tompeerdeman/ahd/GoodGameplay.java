@@ -4,9 +4,6 @@
  */
 package nl.tompeerdeman.ahd;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 
 /**
  * @author Tom Peerdeman
@@ -15,10 +12,9 @@ import java.util.Random;
 public class GoodGameplay extends AbstractGameplayDelegate {
 	/**
 	 * @param wordDatabase
-	 * @param rand
 	 */
-	public GoodGameplay(WordDatabase wordDatabase, Random rand) {
-		super(wordDatabase, rand);
+	public GoodGameplay(WordsModel wordDatabase) {
+		super(wordDatabase);
 	}
 	
 	/*
@@ -75,26 +71,18 @@ public class GoodGameplay extends AbstractGameplayDelegate {
 					"Initialize nice gameplay but settings say evil gameplay");
 		}
 		
-		// Grab all the words.
-		List<String> words =
-			wordDatabase.getWordsInLength(settings.getMaxWordLength(),
-					settings.getMinWordLength());
-		Collections.shuffle(words);
+		// Grab a random word.
+		String word =
+			wordDatabase.getRandWordInLengthRange(settings.getMinWordLength(),
+					settings.getMaxWordLength());
 		
-		String word;
-		if(words.size() > 1) {
-			word = words.get(rand.nextInt(words.size() - 1));
-		} else {
-			word = words.get(0);
-		}
-		
-		// Create a new nice status using a random word from the list.
+		// Create a new nice status using a random word from the model.
 		HangmanGoodStatus status =
 			new HangmanGoodStatus(settings.getMaxNumGuesses(), word);
 		
 		// Reveal spaces if the settings say so.
-		if(settings.shouldRevealSpaces()) {
-			status.revealWhiteSpace();
+		if(settings.shouldRevealNonAlpha()) {
+			status.revealNonAlpha();
 		}
 		
 		return status;

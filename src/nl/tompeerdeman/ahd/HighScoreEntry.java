@@ -13,29 +13,53 @@ import java.io.Serializable;
 public class HighScoreEntry implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private final HangmanStatus status;
-	private final HangmanSettings settings;
+	private final String word;
+	private final int badGuesses;
+	private final long time;
 	
 	/**
+	 * Construct a highscore entry from the active game
+	 * 
 	 * @param status
 	 * @param settings
 	 */
 	public HighScoreEntry(HangmanStatus status, HangmanSettings settings) {
-		this.status = status;
-		this.settings = settings;
+		word = new String(status.getWordChars());
+		badGuesses = settings.getMaxNumGuesses() - status.getRemainingGuesses();
+		time = status.getTime();
 	}
 	
 	/**
-	 * @return the status
+	 * Construct a highscore entry from previous saved games
+	 * 
+	 * @param word
+	 * @param badGuesses
+	 * @param time
 	 */
-	public HangmanStatus getStatus() {
-		return status;
+	public HighScoreEntry(String word, int badGuesses, long time) {
+		this.word = word;
+		this.badGuesses = badGuesses;
+		this.time = time;
 	}
 	
 	/**
-	 * @return the settings
+	 * @return the word
 	 */
-	public HangmanSettings getSettings() {
-		return settings;
+	public String getWord() {
+		return word;
+	}
+	
+	/**
+	 * @return the badGuesses
+	 */
+	public int getBadGuesses() {
+		return badGuesses;
+	}
+	
+	/**
+	 * @return the time
+	 */
+	public long getTime() {
+		return time;
 	}
 }

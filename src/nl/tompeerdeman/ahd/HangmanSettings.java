@@ -13,22 +13,22 @@ public class HangmanSettings implements Serializable {
 	private final int maxWordLength;
 	private final int minWordLength;
 	
-	private final boolean revealSpaces;
+	private final boolean revealNonAlpha;
 	private final boolean evil;
 	
 	/**
 	 * @param maxGuesses
 	 * @param maxWordLength
 	 * @param minWordLength
-	 * @param revealSpaces
+	 * @param revealNonAlpha
 	 * @param evil
 	 */
 	public HangmanSettings(byte maxGuesses, int maxWordLength,
-			int minWordLength, boolean revealSpaces, boolean evil) {
+			int minWordLength, boolean revealNonAlpha, boolean evil) {
 		this.maxGuesses = maxGuesses;
 		this.maxWordLength = maxWordLength;
 		this.minWordLength = minWordLength;
-		this.revealSpaces = revealSpaces;
+		this.revealNonAlpha = revealNonAlpha;
 		this.evil = evil;
 	}
 	
@@ -54,10 +54,10 @@ public class HangmanSettings implements Serializable {
 	}
 	
 	/**
-	 * @return True if we should reveal spaces, otherwise false
+	 * @return True if we should non alphabetic spaces, otherwise false
 	 */
-	public boolean shouldRevealSpaces() {
-		return revealSpaces;
+	public boolean shouldRevealNonAlpha() {
+		return revealNonAlpha;
 	}
 	
 	/**

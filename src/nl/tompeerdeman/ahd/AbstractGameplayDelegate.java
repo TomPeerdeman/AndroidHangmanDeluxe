@@ -4,23 +4,19 @@
  */
 package nl.tompeerdeman.ahd;
 
-import java.util.Random;
 
 /**
  * @author Tom Peerdeman
  * 
  */
 public abstract class AbstractGameplayDelegate implements GameplayDelegate {
-	protected final WordDatabase wordDatabase;
-	protected final Random rand;
+	protected final WordsModel wordDatabase;
 	
 	/**
 	 * @param wordDatabase
-	 * @param rand
 	 */
-	public AbstractGameplayDelegate(WordDatabase wordDatabase, Random rand) {
+	public AbstractGameplayDelegate(WordsModel wordDatabase) {
 		this.wordDatabase = wordDatabase;
-		this.rand = rand;
 	}
 	
 	/**

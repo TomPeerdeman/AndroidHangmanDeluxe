@@ -4,17 +4,16 @@
  */
 package nl.tompeerdeman.ahd.test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import junit.framework.TestCase;
 import nl.tompeerdeman.ahd.GameplayDelegate;
 import nl.tompeerdeman.ahd.GoodGameplay;
 import nl.tompeerdeman.ahd.HangmanSettings;
 import nl.tompeerdeman.ahd.HangmanStatus;
-import nl.tompeerdeman.ahd.WordDatabase;
+import nl.tompeerdeman.ahd.WordsModel;
 
 /**
  * @author Tom Peerdeman
@@ -25,30 +24,24 @@ public class GoodGameplayTest extends TestCase {
 	
 	@Override
 	public void setUp() {
-		WordDatabase db = new WordDatabase() {
-			@Override
-			public List<String> getWordsLike(String like) {
-				return new ArrayList<String>();
-			}
-			
-			@Override
-			public List<String> getWordsInLength(int maxLength, int minLength) {
-				return new ArrayList<String>(Arrays.asList("Word with spaces"));
-			}
-
+		WordsModel db = new WordsModel() {
 			@Override
 			public void insertWord(String word) {
 				throw new RuntimeException("Insert not allowed");
 			}
-
+			
 			@Override
-			public int getNumWords() {
-				return 1;
+			public String getRandWordInLengthRange(int minLength, int maxLength) {
+				return "Word with spaces";
 			}
 			
+			@Override
+			public List<String> getEquivalentWords(String like, char contains) {
+				return Collections.emptyList();
+			}
 		};
 		
-		game = new GoodGameplay(db, new Random());
+		game = new GoodGameplay(db);
 	}
 	
 	/**
@@ -89,7 +82,7 @@ public class GoodGameplayTest extends TestCase {
 		assertTrue(Arrays.equals(status.getGuessedChars(), wordChars));
 		
 		status =
-				game.initialize(new HangmanSettings((byte) 6, 1, 26, true, false));
+			game.initialize(new HangmanSettings((byte) 6, 1, 26, true, false));
 		assertEquals(wordChars.length, origWord.length());
 		assertFalse(Arrays.equals(status.getGuessedChars(), wordChars));
 	}

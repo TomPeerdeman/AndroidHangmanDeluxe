@@ -6,14 +6,11 @@ Database
 The database used is android's built in SQLite database.
 
 #### Highscore's
-| **field name** | id  | word | word_length | bad_guesses | time | game_type |
-| :------------- | --- | :--: | ----------- | ----------- | ---- | --------- |
-| **field type** | INT | TEXT | INT         | INT         | INT  | INT       |
+| **field name** | id  | word | bad_guesses | time | game_type |
+| :------------- | --- | :--: | ----------- | ---- | --------- |
+| **field type** | INT | TEXT | INT         | INT  | INT       |
 
 PRIMARY KEY on id.
-
-word_length is used since the user might filter on word length (not yet planned). 
-The built in LENGTH function is too slow for this.
 
 The time is specified in seconds.
 
@@ -25,6 +22,9 @@ The words.xml file is read and all words are stored in this database.
 | **field type** | TEXT | INT         |
 
 PRIMARY KEY on word.
+
+word_length is used since the user can filter on word length. 
+The built in LENGTH function is too slow for this.
 
 Classes/Interfaces
 ===
@@ -38,19 +38,19 @@ Classes/Interfaces
 		Create a new game (and thus a new status) from the given settings.<br />
 	`public HangmanStatus onGuess(HangmanSettings settings, HangmanStatus status, char guess);`<br />
 		Handle a user triggered guess and adapt the current status to the guess.
-- WordDatabase<br />
+- WordsModel<br />
 	Interface that provides methods to get words from the word list using some constraints on the words. The constraints are length in range or a given equivalence class.
 	Also provides methods to insert words into the word list.
 	This will be implemented using SQLite.
-- WordListReader<br />
-	Class that will read the words.xml file and store all the elements using a given WordDatabase (probably SQLite).
-- HighScore<br />
-	Simple list of highscore entry's
+- HighScoresModel<br />
+	Simple list of highscore entry's.
 - HighScoreEntry<br />
-	Combination of a highscore game's settings and final status.
-- HighScoreDataSource<br />
-	Interface that provides methods to load and save the highscore's.
-	This will be implemented using SQLite.
+	Data structure that holds the word, the amount of bad guesses and the time.
+
+#### Activities
+MainActivity.java - the activity that shows and handles the game itself.<br />
+SettingsActivity.java - the activity that shows all the settings and edit's the underlying structure so that the MainActivity can use them.<br />
+HighScoreActivity.java - shows the highscore (10 games that have been won sorted by time to game completion DESC). Has 3 subcategories (tabs), overall, normal and evil. The overall tab shows the best 10 games, wich can be either normal or evil games. The normal tab shows the best 10 normal games. Etc.<br />
 
 User interface
 ===
@@ -89,31 +89,27 @@ All settings are tiled horizontally.
 
 Activity flow
 ===
-MainActivity.java - the activity that shows and handles the game itself.<br />
-SettingsActivity.java - the activity that shows all the settings and edit's the underlying structure so that the MainActivity can use them.<br />
-HighscoreActivity.java - shows the highscore (10 games that have been won sorted by time ASC). Has 3 subcategories (tabs), overall, normal and evil. The overall tab shows the best 10 games, wich can be either normal or evil games. The normal tab shows the best 10 normal games. Etc.<br />
-
 #### MainActivity
 The MainActivity is started when the game launches.
 When the return buton is pressed in the main activity the game is paused and put into the background.
 The main activity has a menu of 3 items:
 - New game (Starts a new game)
 - Settings (Launches the SettingsActivity)
-- Highscore (Launches the HighscoreActivity)
+- Highscore (Launches the HighScoreActivity)
 
 #### SettingsActivity
 When the return buton is pressed in the settings activity the app activates the MainActivity again.
 The settings activity has a menu of 2 items:
 - Resume game (Activate the MainActivity)
-- Highscore (Launches the HighscoreActivity)
+- Highscore (Launches the HighScoreActivity)
 
-#### HighscoreActivity
+#### HighScoreActivity
 When the return buton is pressed in the highscore activity the app activates the MainActivity again.
 The highscore activity has a menu of 2 items:
 - Resume game (Activate the MainActivity)
 - Settings (Launches the SettingsActivity)
 
-When the hihscore is accessed by first activating the SettingsActivity (through the menu of the MainActivity), and in this SettingsActivity the HighscoreActivity is called (through the menu of the SettingsActivity), the return button should return to the MainActivity and **not** the SettingsActivity. 
+When the highscore is accessed by first activating the SettingsActivity (through the menu of the MainActivity), and in this SettingsActivity the HighScoreActivity is called (through the menu of the SettingsActivity), the return button should return to the MainActivity and **not** the SettingsActivity. 
 
 Style guide
 ===

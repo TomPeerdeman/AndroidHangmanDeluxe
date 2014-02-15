@@ -45,14 +45,13 @@ public class HangmanGoodStatus extends HangmanStatus {
 	}
 	
 	/**
-	 * Reveal all white space.
-	 * Used in easy and normal mode.
+	 * Reveal all non alphabetic characters.
 	 */
-	public void revealWhiteSpace() {
-		// Find the whitespace's and reveal them
+	public void revealNonAlpha() {
+		// Find the non alphabetic characters and reveal them.
 		for(int i = 0; i < word.length; i++) {
-			if(word[i] == ' ') {
-				reveal(i, ' ');
+			if(word[i] > 'z' || word[i] < 'a') {
+				reveal(i, word[i]);
 			}
 		}
 	}

@@ -2,11 +2,13 @@
  * File: WordListReader.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.wordlist;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+
+import nl.tompeerdeman.ahd.WordsModel;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -25,7 +27,7 @@ public abstract class WordListReader {
 	 * @throws XmlPullParserException
 	 * @throws IOException
 	 */
-	public void loadWords(WordDatabase database) throws XmlPullParserException,
+	public void loadWords(WordsModel database) throws XmlPullParserException,
 			IOException {
 		XmlPullParser parser = Xml.newPullParser();
 		InputStream in = getDataStream();

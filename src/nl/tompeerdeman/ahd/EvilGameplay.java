@@ -15,12 +15,14 @@ import java.util.Random;
  * 
  */
 public class EvilGameplay extends AbstractGameplayDelegate {
+	private Random rand;
+	
 	/**
 	 * @param wordDatabase
-	 * @param rand
 	 */
-	public EvilGameplay(WordDatabase wordDatabase, Random rand) {
-		super(wordDatabase, rand);
+	public EvilGameplay(WordsModel wordDatabase) {
+		super(wordDatabase);
+		rand = new Random();
 	}
 	
 	/*
@@ -65,8 +67,8 @@ public class EvilGameplay extends AbstractGameplayDelegate {
 				evilStatus.decrementGuesses();
 			} else {
 				List<String> words =
-					wordDatabase.getWordsLike(new String(
-							evilStatus.getEquivalenceClass()));
+					wordDatabase.getEquivalentWords(
+							new String(evilStatus.getEquivalenceClass()), guess);
 				if(words.size() == 1) {
 					// Only one word left, so we pick it.
 					char[] word = words.get(0).toCharArray();
@@ -165,17 +167,10 @@ public class EvilGameplay extends AbstractGameplayDelegate {
 					"Initialize evil gameplay but settings say nice gameplay");
 		}
 		
-		List<String> words =
-			wordDatabase.getWordsInLength(settings.getMaxWordLength(),
-					settings.getMinWordLength());
-		
-		// Get a random word to determine the size
-		String word;
-		if(words.size() > 1) {
-			word = words.get(rand.nextInt(words.size() - 1));
-		} else {
-			word = words.get(0);
-		}
+		// Grab a random word to determine the size.
+		String word =
+			wordDatabase.getRandWordInLengthRange(settings.getMinWordLength(),
+					settings.getMaxWordLength());
 		
 		// Build equivalence class
 		char[] eqClass = new char[word.length()];
