@@ -58,7 +58,11 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 	 */
 	public SQLiteHighScoresModel(SQLiteDatabase db) {
 		this.db = db;
-		
+
+		loadHighScore();
+	}
+	
+	private void loadHighScore() {
 		// Count the amount of highscore entries for normal and evil.
 		Cursor cursor = db.rawQuery(SELECT_COUNT, null);
 		while(cursor.moveToNext()) {
@@ -137,5 +141,8 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 		}
 		
 		db.execSQL(REMOVE_OVERFLOW_ALL);
+		
+		// Saved highscore's are no longer valid. 
+		loadHighScore();
 	}
 }

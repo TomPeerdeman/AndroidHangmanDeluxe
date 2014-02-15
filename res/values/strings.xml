@@ -11,5 +11,8 @@
     <string name="maxwordlen">Maximum word length</string>
     <string name="minwordlen">Minimum word length</string>
     <string name="gameplay">Gameplay</string>
+    <string name="action_new_game">New game</string>
+    <string name="action_return_game">Return to game</string>
+    <string name="action_highscore">Highscore</string>
 
 </resources>
