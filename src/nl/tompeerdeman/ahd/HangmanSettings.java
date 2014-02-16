@@ -16,6 +16,10 @@ public class HangmanSettings implements Serializable {
 	private final boolean revealNonAlpha;
 	private final boolean evil;
 	
+	public static HangmanSettings getDefaultSettings() {
+		return new HangmanSettings((byte) 6, 12, 3, false, true);
+	}
+	
 	/**
 	 * @param maxGuesses
 	 * @param maxWordLength
@@ -54,7 +58,7 @@ public class HangmanSettings implements Serializable {
 	}
 	
 	/**
-	 * @return True if we should non alphabetic spaces, otherwise false
+	 * @return True if we should non alphabetic characters, otherwise false
 	 */
 	public boolean shouldRevealNonAlpha() {
 		return revealNonAlpha;

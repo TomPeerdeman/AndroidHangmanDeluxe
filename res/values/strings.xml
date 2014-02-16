@@ -7,12 +7,14 @@
     <string name="evil">Evil</string>
     <string name="nice">Nice</string>
     <string name="hidespaces">Hide spaces</string>
-    <string name="maxguesses">Maximum guesses</string>
-    <string name="maxwordlen">Maximum word length</string>
-    <string name="minwordlen">Minimum word length</string>
+    <string name="maxguesses">Maximum guesses: 6</string>
+    <string name="maxwordlen">Maximum word length: 12</string>
+    <string name="minwordlen">Minimum word length: 3</string>
     <string name="gameplay">Gameplay</string>
     <string name="action_new_game">New game</string>
     <string name="action_return_game">Return to game</string>
     <string name="action_highscore">Highscore</string>
+    <string name="hideNonAlpha">Don\'t reveal non alphabetic chars</string>
+    <string name="settingsApply">Settings take effect with a new game</string>
 
 </resources>

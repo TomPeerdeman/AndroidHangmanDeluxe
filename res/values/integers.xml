@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="maxNumGuesses">25</integer>
-    <integer name="defaultNumGuesses">6</integer>
+    <integer name="defaultNumGuesses">5</integer>
+    <integer name="maxWordLength">25</integer>
+    <integer name="minWordLengthProgress">2</integer>
+    <integer name="maxWordLengthProgress">11</integer>
 </resources>

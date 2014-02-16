@@ -35,6 +35,10 @@ public class EvilGameplay extends AbstractGameplayDelegate {
 	@Override
 	public HangmanStatus onGuess(HangmanSettings settings,
 			HangmanStatus status, final char guess) {
+		if(!validChar(guess)) {
+			throw new IllegalArgumentException("Guessed char not in a-z range");
+		}
+		
 		HangmanEvilStatus evilStatus = (HangmanEvilStatus) status;
 		
 		if(evilStatus.isWordChosen()) {

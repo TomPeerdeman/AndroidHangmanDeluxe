@@ -2,7 +2,7 @@
  * File: WordListReader.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd.wordlist;
+package nl.tompeerdeman.ahd.dev.wordlist;
 
 import java.io.IOException;
 import java.io.InputStream;

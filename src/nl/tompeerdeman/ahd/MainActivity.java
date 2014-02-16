@@ -12,6 +12,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
+	private HangmanGame game;
+	
 	private TextView wordView;
 	private TextView guessesView;
 	private TextView timeView;
@@ -26,6 +28,15 @@ public class MainActivity extends Activity {
 		timeView = (TextView) findViewById(R.id.timeTextView);
 		
 		wordView.requestFocus();
+		
+		if(savedInstanceState != null
+				&& savedInstanceState.containsKey("gameObj")) {
+			game = (HangmanGame) savedInstanceState.getSerializable("gameObj");
+			game.onLoad(null);
+		} else {
+			game = new HangmanGame();
+			game.initialize(null);
+		}
 		
 		onReset();
 	}
@@ -66,9 +77,34 @@ public class MainActivity extends Activity {
 		timeView.setText("Time:\n00:00:00:00");
 	}
 	
+	private void closeKeyboard() {
+		/*
+		 * Close the onscreen keyboard.
+		 * Source: http://stackoverflow.com/a/6977565
+		 */
+		((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(
+				wordView.getWindowToken(), 0);
+	}
+	
 	@Override
 	public void onPause() {
 		super.onPause();
+		
+		closeKeyboard();
+	}
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		
+		closeKeyboard();
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		
+		closeKeyboard();
 	}
 	
 	@Override
@@ -81,5 +117,12 @@ public class MainActivity extends Activity {
 		((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(
 				InputMethodManager.SHOW_FORCED,
 				InputMethodManager.HIDE_IMPLICIT_ONLY);
+	}
+	
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		if(game != null) {
+			outState.putSerializable("gameObj", game);
+		}
 	}
 }

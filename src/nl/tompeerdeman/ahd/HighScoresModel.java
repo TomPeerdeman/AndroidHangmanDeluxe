@@ -12,11 +12,21 @@ import java.util.List;
  * 
  */
 public abstract class HighScoresModel implements Serializable {
+	private static HighScoresModel instance;
+	
 	private static final long serialVersionUID = 1L;
 	
 	protected List<HighScoreEntry> highScoresAll;
 	protected List<HighScoreEntry> highScoresEvil;
 	protected List<HighScoreEntry> highScoresNormal;
+	
+	public static HighScoresModel getInstance() {
+		return instance;
+	}
+	
+	protected HighScoresModel() {
+		HighScoresModel.instance = this;
+	}
 	
 	/**
 	 * @return the highScoresAll

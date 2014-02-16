@@ -1,6 +1,7 @@
 package nl.tompeerdeman.ahd;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 
 /**
@@ -49,7 +50,7 @@ public abstract class HangmanStatus implements Serializable {
 		onLoad();
 	}
 	
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
+	private void readObject(ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		in.defaultReadObject();
 		onLoad();
