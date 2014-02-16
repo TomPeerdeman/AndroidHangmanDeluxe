@@ -27,6 +27,7 @@ public class HighScoreFragment extends Fragment {
 			"HH:mm:ss:SS", Locale.US);
 	
 	static {
+		// We want a difference of time, so no accounting for the timezone.
 		TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 	

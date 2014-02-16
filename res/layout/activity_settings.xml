@@ -9,7 +9,7 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/timeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/gameplay"
@@ -43,7 +43,7 @@
             android:text="@string/hidespaces" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/guessesTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/maxguesses"
@@ -64,7 +64,7 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/wordTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/maxwordlen"
