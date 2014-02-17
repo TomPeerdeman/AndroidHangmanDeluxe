@@ -59,8 +59,12 @@ public class MainActivity extends Activity {
 		if(wordDatabase.getRandWordInLengthRange(1, 26) == null) {
 			try {
 				WordListReader reader =
-					new WebWordListReader("http://tompeerdeman.nl/words.xml");
-				reader.loadWords(wordDatabase);
+					new WebWordListReader(this,
+							"http://tompeerdeman.nl/words.xml");
+				Log.i("ahd", "Starting word read");
+				if(reader.execute(wordDatabase) == null) {
+					throw new Exception("Word download failed");
+				}
 			} catch(Exception e) {
 				// TODO: Inform user instead of crashing.
 				e.printStackTrace();
@@ -69,16 +73,16 @@ public class MainActivity extends Activity {
 			}
 		}
 		
-		if(savedInstanceState != null
-				&& savedInstanceState.containsKey("gameObj")) {
-			game = (HangmanGame) savedInstanceState.getSerializable("gameObj");
-			game.onLoad();
-		} else {
-			game = new HangmanGame();
-			game.initialize(wordDatabase);
-		}
-		
-		onReset();
+//		if(savedInstanceState != null
+//				&& savedInstanceState.containsKey("gameObj")) {
+//			game = (HangmanGame) savedInstanceState.getSerializable("gameObj");
+//			game.onLoad();
+//		} else {
+//			game = new HangmanGame();
+//			game.initialize(wordDatabase);
+//		}
+//		
+//		onReset();
 	}
 	
 	@Override

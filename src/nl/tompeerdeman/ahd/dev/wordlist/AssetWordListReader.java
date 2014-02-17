@@ -7,25 +7,30 @@ package nl.tompeerdeman.ahd.dev.wordlist;
 import java.io.IOException;
 import java.io.InputStream;
 
-import android.content.Context;
+import nl.tompeerdeman.ahd.MainActivity;
 
 /**
  * @author Tom Peerdeman
- *
+ * 
  */
 public class AssetWordListReader extends WordListReader {
 	private InputStream in;
 	
 	/**
-	 * @param cntx
-	 * @param filePath name of the asset
+	 * @param main
+	 * @param filePath
+	 *            name of the asset
 	 * @throws IOException
 	 */
-	public AssetWordListReader(Context cntx, String filePath) throws IOException {
-		in = cntx.getAssets().open(filePath);
+	public AssetWordListReader(MainActivity main, String filePath)
+			throws IOException {
+		super(main);
+		in = main.getAssets().open(filePath);
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see nl.tompeerdeman.ahd.WordListReader#getDataStream()
 	 */
 	@Override

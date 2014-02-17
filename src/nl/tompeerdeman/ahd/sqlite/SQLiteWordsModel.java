@@ -22,7 +22,7 @@ public class SQLiteWordsModel implements WordsModel {
 	private final static String SELECT_EQUIVALENT =
 		"SELECT word FROM words WHERE word LIKE '?' AND word LIKE '*?*'";
 	private final static String INSERT_WORD =
-		"INSERT INTO words (word, word_length) VALUES ('?', ?)";
+		"INSERT INTO words (word, word_length) VALUES (?, ?)";
 	
 	private final SQLiteDatabase db;
 	
@@ -78,6 +78,7 @@ public class SQLiteWordsModel implements WordsModel {
 			if(cursor.getCount() != 1) {
 				return null;
 			} else {
+				cursor.moveToFirst();
 				return cursor.getString(0);
 			}
 		} finally {

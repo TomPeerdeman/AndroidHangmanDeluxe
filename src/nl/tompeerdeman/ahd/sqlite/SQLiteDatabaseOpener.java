@@ -24,8 +24,9 @@ public class SQLiteDatabaseOpener extends SQLiteOpenHelper {
 				+ "word TEXT NOT NULL, bad_guesses INTEGER, "
 				+ "time INTEGER, game_type INTEGER)";
 	
-	public SQLiteDatabaseOpener(Context context) {
+	public SQLiteDatabaseOpener(Context context) {	
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		context.deleteDatabase(DATABASE_NAME);
 	}
 	
 	/*
