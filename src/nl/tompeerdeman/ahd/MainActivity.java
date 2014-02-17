@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import nl.tompeerdeman.ahd.dev.wordlist.WebWordListReader;
+import nl.tompeerdeman.ahd.dev.wordlist.WordFileWordListReader;
 import nl.tompeerdeman.ahd.dev.wordlist.WordListReader;
 import nl.tompeerdeman.ahd.sqlite.SQLiteDatabaseOpener;
 import nl.tompeerdeman.ahd.sqlite.SQLiteWordsModel;
@@ -59,8 +59,9 @@ public class MainActivity extends Activity {
 		if(wordDatabase.getRandWordInLengthRange(1, 26) == null) {
 			try {
 				WordListReader reader =
-					new WebWordListReader(this,
-							"http://tompeerdeman.nl/words.xml");
+					new WordFileWordListReader(this, "words.dat");
+				// new WebWordListReader(this,
+				// "http://tompeerdeman.nl/words.xml");
 				Log.i("ahd", "Starting word read");
 				if(reader.execute(wordDatabase) == null) {
 					throw new Exception("Word download failed");
@@ -73,16 +74,16 @@ public class MainActivity extends Activity {
 			}
 		}
 		
-//		if(savedInstanceState != null
-//				&& savedInstanceState.containsKey("gameObj")) {
-//			game = (HangmanGame) savedInstanceState.getSerializable("gameObj");
-//			game.onLoad();
-//		} else {
-//			game = new HangmanGame();
-//			game.initialize(wordDatabase);
-//		}
-//		
-//		onReset();
+		// if(savedInstanceState != null
+		// && savedInstanceState.containsKey("gameObj")) {
+		// game = (HangmanGame) savedInstanceState.getSerializable("gameObj");
+		// game.onLoad();
+		// } else {
+		// game = new HangmanGame();
+		// game.initialize(wordDatabase);
+		// }
+		//
+		// onReset();
 	}
 	
 	@Override
