@@ -9,14 +9,7 @@ package nl.tompeerdeman.ahd;
  * @author Tom Peerdeman
  * 
  */
-public class GoodGameplay extends AbstractGameplayDelegate {
-	/**
-	 * @param wordDatabase
-	 */
-	public GoodGameplay(WordsModel wordDatabase) {
-		super(wordDatabase);
-	}
-	
+public class GoodGameplay implements GameplayDelegate {
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -26,8 +19,8 @@ public class GoodGameplay extends AbstractGameplayDelegate {
 	 */
 	@Override
 	public HangmanStatus onGuess(HangmanSettings settings,
-			HangmanStatus status, char guess) {
-		if(!validChar(guess)) {
+			HangmanStatus status, WordsModel wordDatabase, char guess) {
+		if(!HangmanGame.validChar(guess)) {
 			throw new IllegalArgumentException("Guessed char not in a-z range");
 		}
 		
@@ -65,7 +58,7 @@ public class GoodGameplay extends AbstractGameplayDelegate {
 	 * .HangmanSettings, nl.tompeerdeman.ahd.HangmanStatus)
 	 */
 	@Override
-	public HangmanStatus initialize(HangmanSettings settings) {
+	public HangmanStatus initialize(HangmanSettings settings, WordsModel wordDatabase) {
 		if(settings.isEvil()) {
 			throw new IllegalArgumentException(
 					"Initialize nice gameplay but settings say evil gameplay");

@@ -14,14 +14,12 @@ import java.util.Random;
  * @author Tom Peerdeman
  * 
  */
-public class EvilGameplay extends AbstractGameplayDelegate {
+public class EvilGameplay implements GameplayDelegate {
 	private Random rand;
 	
 	/**
-	 * @param wordDatabase
 	 */
-	public EvilGameplay(WordsModel wordDatabase) {
-		super(wordDatabase);
+	public EvilGameplay() {
 		rand = new Random();
 	}
 	
@@ -34,8 +32,8 @@ public class EvilGameplay extends AbstractGameplayDelegate {
 	 */
 	@Override
 	public HangmanStatus onGuess(HangmanSettings settings,
-			HangmanStatus status, final char guess) {
-		if(!validChar(guess)) {
+			HangmanStatus status, WordsModel wordDatabase, final char guess) {
+		if(!HangmanGame.validChar(guess)) {
 			throw new IllegalArgumentException("Guessed char not in a-z range");
 		}
 		
@@ -165,7 +163,8 @@ public class EvilGameplay extends AbstractGameplayDelegate {
 	 * .HangmanSettings)
 	 */
 	@Override
-	public HangmanStatus initialize(HangmanSettings settings) {
+	public HangmanStatus initialize(HangmanSettings settings,
+			WordsModel wordDatabase) {
 		if(!settings.isEvil()) {
 			throw new IllegalArgumentException(
 					"Initialize evil gameplay but settings say nice gameplay");

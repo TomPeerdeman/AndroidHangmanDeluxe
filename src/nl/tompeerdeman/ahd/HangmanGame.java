@@ -25,6 +25,16 @@ public class HangmanGame implements Serializable {
 		return instance;
 	}
 	
+	/**
+	 * Check to see if the character is in the a-z range.
+	 * 
+	 * @param character
+	 * @return True if the character is in the a-z range
+	 */
+	public static boolean validChar(char character) {
+		return (character <= 'z' && character >= 'a');
+	}
+	
 	public HangmanGame() {
 		HangmanGame.instance = this;
 	}
@@ -46,32 +56,30 @@ public class HangmanGame implements Serializable {
 		// Create the gameplay delegate based on the settings.
 		if(gameplayDelegate == null) {
 			if(settings.isEvil()) {
-				gameplayDelegate = new EvilGameplay(wordDatabase);
+				gameplayDelegate = new EvilGameplay();
 			} else {
-				gameplayDelegate = new GoodGameplay(wordDatabase);
+				gameplayDelegate = new GoodGameplay();
 			}
 		} else if(gameplayDelegate instanceof EvilGameplay
 				&& !settings.isEvil()) {
-			gameplayDelegate = new GoodGameplay(wordDatabase);
+			gameplayDelegate = new GoodGameplay();
 		} else if(gameplayDelegate instanceof GoodGameplay && settings.isEvil()) {
-			gameplayDelegate = new EvilGameplay(wordDatabase);
+			gameplayDelegate = new EvilGameplay();
 		}
 		
 		// Generate new status.
-		status = gameplayDelegate.initialize(settings);
+		status = gameplayDelegate.initialize(settings, wordDatabase);
 	}
 	
 	/**
 	 * Initialize a game that has been loaded from storage.
-	 * 
-	 * @param wordDatabase
 	 */
-	public void onLoad(WordsModel wordDatabase) {
+	public void onLoad() {
 		// Create the gameplay delegate based on the settings.
 		if(settings.isEvil()) {
-			gameplayDelegate = new EvilGameplay(wordDatabase);
+			gameplayDelegate = new EvilGameplay();
 		} else {
-			gameplayDelegate = new GoodGameplay(wordDatabase);
+			gameplayDelegate = new GoodGameplay();
 		}
 	}
 	

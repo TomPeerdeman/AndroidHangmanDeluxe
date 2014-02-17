@@ -1,8 +1,18 @@
 package nl.tompeerdeman.ahd;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import nl.tompeerdeman.ahd.dev.wordlist.WebWordListReader;
+import nl.tompeerdeman.ahd.dev.wordlist.WordListReader;
+import nl.tompeerdeman.ahd.sqlite.SQLiteDatabaseOpener;
+import nl.tompeerdeman.ahd.sqlite.SQLiteWordsModel;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -12,6 +22,18 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
+	private final static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(
+			"HH:mm:ss:SS", Locale.US);
+	
+	static {
+		// We want a difference of time, so no accounting for the timezone.
+		TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+	}
+	
+	private SQLiteDatabaseOpener dbOpener;
+	private SQLiteDatabase db;
+	private WordsModel wordDatabase;
+	
 	private HangmanGame game;
 	
 	private TextView wordView;
@@ -29,13 +51,31 @@ public class MainActivity extends Activity {
 		
 		wordView.requestFocus();
 		
+		dbOpener = new SQLiteDatabaseOpener(this);
+		db = dbOpener.open();
+		
+		wordDatabase = new SQLiteWordsModel(db);
+		// Empty word list?
+		if(wordDatabase.getRandWordInLengthRange(1, 26) == null) {
+			try {
+				WordListReader reader =
+					new WebWordListReader("http://tompeerdeman.nl/words.xml");
+				reader.loadWords(wordDatabase);
+			} catch(Exception e) {
+				// TODO: Inform user instead of crashing.
+				e.printStackTrace();
+				finish();
+				return;
+			}
+		}
+		
 		if(savedInstanceState != null
 				&& savedInstanceState.containsKey("gameObj")) {
 			game = (HangmanGame) savedInstanceState.getSerializable("gameObj");
-			game.onLoad(null);
+			game.onLoad();
 		} else {
 			game = new HangmanGame();
-			game.initialize(null);
+			game.initialize(wordDatabase);
 		}
 		
 		onReset();
@@ -68,13 +108,30 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		Log.i("ahd", "Key up " + keyCode);
+		
+		char guess = (char) event.getUnicodeChar();
+		if(HangmanGame.validChar(guess)) {
+			// Process the guess, the settings are passed by reference so no
+			// setSettings is required.
+			game.getGameplayDelegate().onGuess(game.getSettings(),
+					game.getStatus(), wordDatabase, guess);
+			
+			Log.i("ahd-word", new String(game.getStatus().getGuessedChars()));
+		}
+		
 		return super.onKeyUp(keyCode, event);
 	}
 	
 	public void onReset() {
+		Log.i("ahd-word", new String(game.getStatus().getGuessedChars()));
+		
 		wordView.setText("Test");
-		guessesView.setText("Guesses:\n0/0");
-		timeView.setText("Time:\n00:00:00:00");
+		final int maxGuesses = game.getSettings().getMaxNumGuesses();
+		guessesView.setText("Guesses:\n"
+				+ (maxGuesses - game.getStatus().getRemainingGuesses()) + "/"
+				+ maxGuesses);
+		timeView.setText("Time:\n"
+				+ TIME_FORMAT.format(new Date(game.getStatus().getTime())));
 	}
 	
 	private void closeKeyboard() {
@@ -105,6 +162,10 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 		
 		closeKeyboard();
+		
+		if(db != null) {
+			db.close();
+		}
 	}
 	
 	@Override
