@@ -6,6 +6,8 @@ package nl.tompeerdeman.ahd;
 
 import java.io.IOException;
 
+import android.util.Log;
+
 /**
  * @author Tom Peerdeman
  * 
@@ -60,16 +62,23 @@ public class HangmanEvilStatus extends HangmanStatus {
 	public boolean containsPrevGuessed(String word) {
 		int idx;
 		for(int i = 0; i < nPrevGuessedChars; i++) {
-			idx = word.indexOf(prevGuessedChars[i], 0);
-			if(idx >= 0 && word.charAt(idx) != equivalenceClass[idx]) {
-				return true;
-			}
+			idx = 0;
+			do {
+				idx = word.indexOf(prevGuessedChars[i], idx + 1);
+				if(idx >= 0 && word.charAt(idx) != equivalenceClass[idx]) {
+					return true;
+				}
+			} while(idx >= 0);
 		}
 		return false;
 	}
 	
 	public void addPrevGuessedChar(char c) {
 		prevGuessedChars[nPrevGuessedChars++] = c;
+		Log.i("adh-evil", "Add new prev char " + c);
+		for(int i = 0; i < nPrevGuessedChars; i++) {
+			Log.i("adh-evil", "Prev char " + prevGuessedChars[i]);
+		}
 	}
 	
 	/**

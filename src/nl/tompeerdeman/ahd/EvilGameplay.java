@@ -77,7 +77,8 @@ public class EvilGameplay implements GameplayDelegate {
 					wordDatabase.getEquivalentWords(
 							new String(evilStatus.getEquivalenceClass()), guess);
 				Log.i("ahd-game", "Get equivalent words: " + words.size());
-				if(words.size() == 1) {
+				if(words.size() == 1
+						&& !evilStatus.containsPrevGuessed(words.get(0))) {
 					// Only one word left, so we pick it.
 					char[] word = words.get(0).toCharArray();
 					evilStatus.setEquivalenceClass(word);
@@ -98,43 +99,45 @@ public class EvilGameplay implements GameplayDelegate {
 							// Replace all non guess characters with
 							// GameplayDelegate.UNKNOWN_CHARACTER.
 							eq = equivalize(word, guess);
+							Log.i("ahd-word", "Equivalize " + word + " -> "
+									+ eq);
 							if(eqClasses.containsKey(eq)) {
 								// Increment the number of words for this class
 								eqClasses.get(eq).addWord();
 							} else {
-								eqClasses.put(eq, new EquivalenceClass(eq));
+								eqClasses.put(eq, new EquivalenceClass(eq, word));
 							}
 						}
 					}
 					
 					Log.i("ahd-game", "Num eq classes " + eqClasses.size());
 					
-					EquivalenceClass lowClass = null;
+					EquivalenceClass highClass = null;
 					if(eqClasses.size() > 1) {
 						// Get the class with the lowest score.
-						int lowScore = Integer.MAX_VALUE;
+						int highScore = 0;
 						for(EquivalenceClass q : eqClasses.values()) {
 							int score = q.getScore(guess);
-							if(score < lowScore) {
-								lowScore = score;
-								lowClass = q;
+							if(score > highScore) {
+								highScore = score;
+								highClass = q;
 							}
 						}
 					} else if(eqClasses.size() == 1) {
 						// Get the only class.
-						lowClass = eqClasses.values().iterator().next();
+						highClass = eqClasses.values().iterator().next();
 					}
 					
-					if(lowClass != null) {
+					if(highClass != null) {
 						Log.i("ahd-game",
-								"Low eq class " + lowClass.getEqClass() + " "
-										+ lowClass.getNumWords());
+								"Low eq class " + highClass.getEqClass() + " "
+										+ highClass.getNumWords());
 						
 						// Insert the new guess into the old eq class at the
 						// positions of the positions in lowClass.
 						char[] eqArr = evilStatus.getEquivalenceClass();
 						for(int i = 0; i < eqArr.length; i++) {
-							if(lowClass.getEqClass().charAt(i) == guess) {
+							if(highClass.getEqClass().charAt(i) == guess) {
 								eqArr[i] = guess;
 								evilStatus.reveal(i, guess);
 							}
@@ -142,29 +145,12 @@ public class EvilGameplay implements GameplayDelegate {
 						
 						evilStatus.setEquivalenceClass(eqArr);
 						
-						if(lowClass.getNumWords() == 1) {
+						if(highClass.getNumWords() == 1) {
 							// Only one word left, so we pick it.
 							evilStatus.setWordChosen(true);
 							
-							words =
-								wordDatabase.getEquivalentWords(new String(
-										eqArr), guess);
-							
-							if(words.size() != 1) {
-								throw new RuntimeException(
-										"The words model gained extra magic words "
-												+ words.size());
-							}
-							
-							evilStatus.setEquivalenceClass(words.get(0)
-																.toCharArray());
-							
-							for(int i = 0; i < eqArr.length; i++) {
-								// The guessed character is in the word.
-								if(eqArr[i] == guess) {
-									evilStatus.reveal(i, guess);
-								}
-							}
+							evilStatus.setEquivalenceClass(highClass.getFirstWord()
+																	.toCharArray());
 						}
 					}
 				} else {
@@ -215,13 +201,17 @@ public class EvilGameplay implements GameplayDelegate {
 	
 	private class EquivalenceClass {
 		private final String eqClass;
+		private String firstWord;
+		
 		private int nWords;
 		
 		/**
 		 * @param eqClass
+		 * @param firstWord 
 		 */
-		public EquivalenceClass(String eqClass) {
+		public EquivalenceClass(String eqClass, String firstWord) {
 			this.eqClass = eqClass;
+			this.firstWord = firstWord;
 			nWords = 1;
 		}
 		
@@ -241,7 +231,12 @@ public class EvilGameplay implements GameplayDelegate {
 		}
 		
 		public int getScore(char guess) {
-			return (countOccurences(guess) * 100) / nWords + rand.nextInt(10);
+			return (countOccurences(guess) * 40) + (nWords * 10)
+					+ rand.nextInt(10);
+		}
+		
+		public String getFirstWord() {
+			return firstWord;
 		}
 		
 		private int countOccurences(char needle) {

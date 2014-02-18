@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 
+import android.util.Log;
+
 /**
  * @author Tom Peerdeman
  * 
@@ -74,14 +76,14 @@ public abstract class HangmanStatus implements Serializable {
 	public long getTime() {
 		return time;
 	}
-
+	
 	/**
-	 * @param time the time to add
+	 * @param time
+	 *            the time to add
 	 */
 	public void addTime(long time) {
 		this.time += time;
 	}
-
 	
 	/**
 	 * @return True of the game has been lost, otherwise false
@@ -138,5 +140,8 @@ public abstract class HangmanStatus implements Serializable {
 		
 		guessedChars[idx] = character;
 		numRevealed++;
+		
+		Log.i("ahd-game", "Reveal " + character + " at " + idx + "("
+				+ numRevealed + "/" + guessedChars.length + ")");
 	}
 }
