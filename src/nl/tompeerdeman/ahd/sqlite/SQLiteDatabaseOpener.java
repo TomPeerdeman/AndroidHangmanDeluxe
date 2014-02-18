@@ -4,9 +4,16 @@
  */
 package nl.tompeerdeman.ahd.sqlite;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * @author Tom Peerdeman
@@ -24,9 +31,8 @@ public class SQLiteDatabaseOpener extends SQLiteOpenHelper {
 				+ "word TEXT NOT NULL, bad_guesses INTEGER, "
 				+ "time INTEGER, game_type INTEGER)";
 	
-	public SQLiteDatabaseOpener(Context context) {	
+	public SQLiteDatabaseOpener(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		context.deleteDatabase(DATABASE_NAME);
 	}
 	
 	/*
@@ -38,8 +44,58 @@ public class SQLiteDatabaseOpener extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		// Dev code for generating the db.sqlite file in assets.
 		db.execSQL(WORDS_CREATE);
 		db.execSQL(HIGHSCORE_CREATE);
+	}
+	
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		// Dev code for generating the db.sqlite file in assets.
+		// Drop & recreate tables.
+		db.execSQL("DROP TABLE IF EXISTS words");
+		db.execSQL("DROP TABLE IF EXISTS highscore");
+		onCreate(db);
+	}
+	
+	
+	/**
+	 * Create the db if it doesn't exists.
+	 * 
+	 * @param context
+	 * @throws IOException
+	 */
+	// Java is stupid... Var in is always closed, java says nope.
+	@SuppressWarnings("resource")
+	public void createDb(Context context) throws IOException {
+		File dbFile = context.getDatabasePath(DATABASE_NAME);
+		if(!dbFile.exists()) {
+			InputStream in = null;
+			OutputStream out = null;
+			try {
+				in = context.getAssets().open("db.sqlite");
+				out = new FileOutputStream(dbFile);
+				Log.i("ahd-db", "Copying db.sqlite --> " + dbFile.getName());
+				byte[] buf = new byte[1024];
+				int n;
+				
+				while((n = in.read(buf)) > 0) {
+					out.write(buf, 0, n);
+				}
+				Log.i("ahd-db", "Database copied from asset");
+			} catch(IOException e) {
+				throw e;
+			} finally {
+				if(in != null) {
+					in.close();
+				}
+				
+				if(out != null) {
+					out.flush();
+					out.close();
+				}
+			}
+		}
 	}
 	
 	/**
@@ -49,20 +105,5 @@ public class SQLiteDatabaseOpener extends SQLiteOpenHelper {
 	 */
 	public SQLiteDatabase open() {
 		return getWritableDatabase();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.database.sqlite.SQLiteOpenHelper#onUpgrade(android.database.sqlite
-	 * .SQLiteDatabase, int, int)
-	 */
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// Drop & recreate tables.
-		db.execSQL("DROP TABLE IF EXISTS words");
-		db.execSQL("DROP TABLE IF EXISTS highscore");
-		onCreate(db);
 	}
 }

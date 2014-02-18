@@ -11,6 +11,7 @@ import java.util.List;
 import nl.tompeerdeman.ahd.WordsModel;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 /**
  * @author Tom Peerdeman
@@ -20,9 +21,10 @@ public class SQLiteWordsModel implements WordsModel {
 	private final static String SELECT_RAND_INRANGE =
 		"SELECT word FROM words WHERE word_length BETWEEN ? AND ? ORDER BY RANDOM() LIMIT 1";
 	private final static String SELECT_EQUIVALENT =
-		"SELECT word FROM words WHERE word LIKE '?' AND word LIKE '*?*'";
+		"SELECT word FROM words WHERE word LIKE ? AND word LIKE ?";
 	private final static String INSERT_WORD =
 		"INSERT INTO words (word, word_length) VALUES (?, ?)";
+	private final static String COUNT_WORDS = "SELECT COUNT(*) FROM words";
 	
 	private final SQLiteDatabase db;
 	
@@ -41,10 +43,12 @@ public class SQLiteWordsModel implements WordsModel {
 	 */
 	@Override
 	public List<String> getEquivalentWords(String like, char contains) {
+		Log.i("ahd-db", "Get words like " + like);
 		Cursor cursor =
 			db.rawQuery(SELECT_EQUIVALENT,
-					new String[] {like, String.valueOf(contains)});
+					new String[] {like, "%"+ String.valueOf(contains) + "%"});
 		int count = cursor.getCount();
+		Log.i("ahd-db", "LIKE Result " + count);
 		
 		if(count == 0) {
 			cursor.close();
@@ -95,5 +99,26 @@ public class SQLiteWordsModel implements WordsModel {
 	public void insertWord(String word) {
 		db.execSQL(INSERT_WORD,
 				new String[] {word, String.valueOf(word.length())});
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.tompeerdeman.ahd.WordsModel#getNumWords()
+	 */
+	@Override
+	public int getNumWords() {
+		Cursor cursor = db.rawQuery(COUNT_WORDS, null);
+		
+		try {
+			if(cursor.getCount() != 1) {
+				return -1;
+			} else {
+				cursor.moveToFirst();
+				return cursor.getInt(0);
+			}
+		} finally {
+			cursor.close();
+		}
 	}
 }

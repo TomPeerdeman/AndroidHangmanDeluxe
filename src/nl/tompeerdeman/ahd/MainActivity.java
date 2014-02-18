@@ -1,12 +1,11 @@
 package nl.tompeerdeman.ahd;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import nl.tompeerdeman.ahd.dev.wordlist.WordFileWordListReader;
-import nl.tompeerdeman.ahd.dev.wordlist.WordListReader;
 import nl.tompeerdeman.ahd.sqlite.SQLiteDatabaseOpener;
 import nl.tompeerdeman.ahd.sqlite.SQLiteWordsModel;
 import android.app.Activity;
@@ -52,38 +51,53 @@ public class MainActivity extends Activity {
 		wordView.requestFocus();
 		
 		dbOpener = new SQLiteDatabaseOpener(this);
+		try {
+			dbOpener.createDb(this);
+		} catch(IOException e) {
+			e.printStackTrace();
+			finish();
+			return;
+		}
 		db = dbOpener.open();
 		
 		wordDatabase = new SQLiteWordsModel(db);
+		
+		Log.i("ahd-db", "Num words in db: " + wordDatabase.getNumWords());
+		Log.i("ahd-db",
+				"Get rand word: "
+						+ wordDatabase.getRandWordInLengthRange(1, 26));
+		
 		// Empty word list?
-		if(wordDatabase.getRandWordInLengthRange(1, 26) == null) {
-			try {
-				WordListReader reader =
-					new WordFileWordListReader(this, "words.dat");
-				// new WebWordListReader(this,
-				// "http://tompeerdeman.nl/words.xml");
-				Log.i("ahd", "Starting word read");
-				if(reader.execute(wordDatabase) == null) {
-					throw new Exception("Word download failed");
-				}
-			} catch(Exception e) {
-				// TODO: Inform user instead of crashing.
-				e.printStackTrace();
-				finish();
-				return;
-			}
+		// if(wordDatabase.getRandWordInLengthRange(1, 26) == null) {
+		// try {
+		// WordListReader reader =
+		// // new WordFileWordListReader(this, "words.dat");
+		// new WebWordListReader(this,
+		// "http://tompeerdeman.nl/words.xml");
+		// Log.i("ahd", "Starting word read");
+		// if(reader.execute(wordDatabase) == null) {
+		// throw new Exception("Word download failed");
+		// }
+		// } catch(Exception e) {
+		// // TODO: Inform user instead of crashing.
+		// e.printStackTrace();
+		// finish();
+		// return;
+		// }
+		// }
+		
+		if(savedInstanceState != null
+				&& savedInstanceState.containsKey("gameObj")) {
+			game = (HangmanGame) savedInstanceState.getSerializable("gameObj");
+			game.onLoad();
+			Log.i("ahd", "Load game from bundle");
+		} else {
+			game = new HangmanGame();
+			game.initialize(wordDatabase);
+			Log.i("ahd", "Load fresh game");
 		}
 		
-		// if(savedInstanceState != null
-		// && savedInstanceState.containsKey("gameObj")) {
-		// game = (HangmanGame) savedInstanceState.getSerializable("gameObj");
-		// game.onLoad();
-		// } else {
-		// game = new HangmanGame();
-		// game.initialize(wordDatabase);
-		// }
-		//
-		// onReset();
+		onReset();
 	}
 	
 	@Override
@@ -114,14 +128,20 @@ public class MainActivity extends Activity {
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		Log.i("ahd", "Key up " + keyCode);
 		
-		char guess = (char) event.getUnicodeChar();
+		char guess = (char) Character.toUpperCase(event.getUnicodeChar());
 		if(HangmanGame.validChar(guess)) {
 			// Process the guess, the settings are passed by reference so no
 			// setSettings is required.
 			game.getGameplayDelegate().onGuess(game.getSettings(),
 					game.getStatus(), wordDatabase, guess);
 			
-			Log.i("ahd-word", new String(game.getStatus().getGuessedChars()));
+			if(game.getStatus().hasLostGame()) {
+				Log.i("ahd-word", "You lost!");
+			}
+			
+			Log.i("ahd-word", guess + " --> " + new String(game.getStatus().getGuessedChars()));
+			showCurrentGuesses();
+			showCurrentWord();
 		}
 		
 		return super.onKeyUp(keyCode, event);
@@ -129,12 +149,31 @@ public class MainActivity extends Activity {
 	
 	public void onReset() {
 		Log.i("ahd-word", new String(game.getStatus().getGuessedChars()));
+		Log.i("ahd-word", new String(((HangmanEvilStatus) game.getStatus()).getEquivalenceClass()));
 		
-		wordView.setText("Test");
+		showCurrentWord();
+		showCurrentGuesses();
+		showCurrentTime();
+	}
+	
+	public void showCurrentWord() {
+		char[] word = game.getStatus().getGuessedChars();
+		char[] newWord = new char[word.length * 2];
+		for(int i = 0, j = 0; j < word.length; i += 2, j++) {
+			newWord[i] = word[j];
+			newWord[i+1] = ' ';
+		}
+		wordView.setText(new String(newWord));
+	}
+	
+	public void showCurrentGuesses() {
 		final int maxGuesses = game.getSettings().getMaxNumGuesses();
 		guessesView.setText("Guesses:\n"
 				+ (maxGuesses - game.getStatus().getRemainingGuesses()) + "/"
 				+ maxGuesses);
+	}
+	
+	public void showCurrentTime() {
 		timeView.setText("Time:\n"
 				+ TIME_FORMAT.format(new Date(game.getStatus().getTime())));
 	}
@@ -187,6 +226,7 @@ public class MainActivity extends Activity {
 	
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+		Log.i("ahd", "Save called!");
 		if(game != null) {
 			outState.putSerializable("gameObj", game);
 		}

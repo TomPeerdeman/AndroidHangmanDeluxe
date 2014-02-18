@@ -32,7 +32,7 @@ public class HangmanGame implements Serializable {
 	 * @return True if the character is in the a-z range
 	 */
 	public static boolean validChar(char character) {
-		return (character <= 'z' && character >= 'a');
+		return (character <= 'Z' && character >= 'A');
 	}
 	
 	public HangmanGame() {

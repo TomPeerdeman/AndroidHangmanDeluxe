@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import android.util.Log;
+
 /**
  * @author Tom Peerdeman
  * 
@@ -44,6 +46,8 @@ public class EvilGameplay implements GameplayDelegate {
 			
 			char[] word = evilStatus.getWordChars();
 			char[] revealed = evilStatus.getGuessedChars();
+			Log.i("ahd-game", "Word chosen: " + new String(word)
+					+ "; Current: " + new String(revealed));
 			
 			boolean charFound = false;
 			for(int i = 0; i < word.length; i++) {
@@ -54,6 +58,7 @@ public class EvilGameplay implements GameplayDelegate {
 				
 				// The guessed character is in the word.
 				if(word[i] == guess) {
+					Log.i("ahd-game", "Found guessed char at idx " + i);
 					charFound = true;
 					evilStatus.reveal(i, guess);
 				}
@@ -71,6 +76,7 @@ public class EvilGameplay implements GameplayDelegate {
 				List<String> words =
 					wordDatabase.getEquivalentWords(
 							new String(evilStatus.getEquivalenceClass()), guess);
+				Log.i("ahd-game", "Get equivalent words: " + words.size());
 				if(words.size() == 1) {
 					// Only one word left, so we pick it.
 					char[] word = words.get(0).toCharArray();
@@ -99,6 +105,8 @@ public class EvilGameplay implements GameplayDelegate {
 						}
 					}
 					
+					Log.i("ahd-game", "Num eq classes " + eqClasses.size());
+					
 					EquivalenceClass lowClass = null;
 					if(eqClasses.size() > 1) {
 						// Get the class with the lowest score.
@@ -114,6 +122,9 @@ public class EvilGameplay implements GameplayDelegate {
 						// Get the only class.
 						lowClass = eqClasses.values().iterator().next();
 					}
+					
+					Log.i("ahd-game", "Low eq class " + lowClass.getEqClass()
+							+ " " + lowClass.getNumWords());
 					
 					if(lowClass != null) {
 						// Insert the new guess into the old eq class at the
@@ -174,6 +185,8 @@ public class EvilGameplay implements GameplayDelegate {
 		String word =
 			wordDatabase.getRandWordInLengthRange(settings.getMinWordLength(),
 					settings.getMaxWordLength());
+		
+		Log.i("ahd-evil", "Set word length " + word.length());
 		
 		// Build equivalence class
 		char[] eqClass = new char[word.length()];

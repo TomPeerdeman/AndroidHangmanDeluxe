@@ -37,4 +37,9 @@ public interface WordsModel {
 	 * @param word
 	 */
 	public void insertWord(String word);
+	
+	/**
+	 * @return The amount of words this model contains
+	 */
+	public int getNumWords();
 }
