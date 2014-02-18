@@ -16,5 +16,6 @@
     <string name="action_highscore">Highscore</string>
     <string name="hideNonAlpha">Don\'t reveal non alphabetic chars</string>
     <string name="settingsApply">Settings take effect with a new game</string>
+    <string name="openKeyboard">Open keyboard</string>
 
 </resources>

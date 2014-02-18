@@ -30,27 +30,40 @@
         android:layout_marginRight="5dp"
         android:layout_marginTop="80dp"
         android:gravity="center_horizontal"
+        android:focusable="true"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/guessesTextView"
-        android:layout_width="80dp"
+        android:layout_width="85dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:focusableInTouchMode="true"
         android:layout_below="@+id/timeTextView"
-         android:layout_marginRight="5dp"
+        android:layout_marginRight="5dp"
         android:layout_marginTop="20dp"
         android:text="" />
 
     <TextView
         android:id="@+id/timeTextView"
-        android:layout_width="80dp"
+        android:layout_width="85dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="5dp"
         android:layout_marginTop="10dp"
         android:text="" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/wordTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="85dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text="@string/openKeyboard" />
 
 </RelativeLayout>

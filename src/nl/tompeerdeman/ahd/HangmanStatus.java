@@ -79,10 +79,10 @@ public abstract class HangmanStatus implements Serializable {
 	
 	/**
 	 * @param time
-	 *            the time to add
+	 *            the time to set
 	 */
-	public void addTime(long time) {
-		this.time += time;
+	public void setTime(long time) {
+		this.time = time;
 	}
 	
 	/**

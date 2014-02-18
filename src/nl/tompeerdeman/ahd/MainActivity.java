@@ -14,14 +14,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnClickListener {
 	private final static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(
 			"HH:mm:ss:SS", Locale.US);
 	
@@ -41,6 +46,22 @@ public class MainActivity extends Activity {
 	private TextView timeView;
 	
 	private ReentrantLock inputLock;
+	private boolean paused;
+	
+	private Handler myHandler;
+	private long startTime;
+	private Runnable updateTime = new Runnable() {
+		public void run() {
+			if(paused) {
+				return;
+			}
+			
+			game.getStatus().setTime(SystemClock.elapsedRealtime() - startTime);
+			showCurrentTime();
+			
+			myHandler.postDelayed(updateTime, 100);
+		}
+	};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +69,14 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		inputLock = new ReentrantLock();
+		myHandler = new Handler();
+		paused = false;
 		
 		wordView = (TextView) findViewById(R.id.wordTextView);
 		guessesView = (TextView) findViewById(R.id.guessesTextView);
 		timeView = (TextView) findViewById(R.id.timeTextView);
+		
+		((Button) findViewById(R.id.button1)).setOnClickListener(this);
 		
 		wordView.requestFocus();
 		
@@ -84,7 +109,6 @@ public class MainActivity extends Activity {
 		// throw new Exception("Word download failed");
 		// }
 		// } catch(Exception e) {
-		// // TODO: Inform user instead of crashing.
 		// e.printStackTrace();
 		// finish();
 		// return;
@@ -110,6 +134,20 @@ public class MainActivity extends Activity {
 	 */
 	public ReentrantLock getInputLock() {
 		return inputLock;
+	}
+	
+	/**
+	 * @return the wordDatabase
+	 */
+	public WordsModel getWordDatabase() {
+		return wordDatabase;
+	}
+	
+	/**
+	 * @return the game
+	 */
+	public HangmanGame getGame() {
+		return game;
 	}
 	
 	@Override
@@ -148,17 +186,18 @@ public class MainActivity extends Activity {
 		return super.onKeyUp(keyCode, event);
 	}
 	
-	/**
-	 * @return the wordDatabase
-	 */
-	public WordsModel getWordDatabase() {
-		return wordDatabase;
-	}
-	
 	public void onKeyCallback() {
 		Log.i("ahd-word", new String(game.getStatus().getGuessedChars()));
 		showCurrentGuesses();
 		showCurrentWord();
+		
+		wordView.requestFocus();
+		
+		if(game.getStatus().hasLostGame()) {
+			stopTimer();
+		} else if(game.getStatus().hasWonGame()) {
+			stopTimer();
+		}
 	}
 	
 	public void onReset() {
@@ -167,9 +206,16 @@ public class MainActivity extends Activity {
 				new String(
 						((HangmanEvilStatus) game.getStatus()).getEquivalenceClass()));
 		
+		startTime = SystemClock.elapsedRealtime();
+		myHandler.removeCallbacks(updateTime);
+		game.getStatus().setTime(0);
+		
 		showCurrentWord();
 		showCurrentGuesses();
 		showCurrentTime();
+		
+		startTime = SystemClock.elapsedRealtime();
+		myHandler.postDelayed(updateTime, 100);
 	}
 	
 	public void showCurrentWord() {
@@ -203,17 +249,36 @@ public class MainActivity extends Activity {
 				wordView.getWindowToken(), 0);
 	}
 	
+	private void showKeyboard() {
+		/*
+		 * Force show the onscreen keyboard.
+		 * Source: http://stackoverflow.com/a/6977565
+		 */
+		((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(
+				InputMethodManager.SHOW_FORCED,
+				InputMethodManager.HIDE_IMPLICIT_ONLY);
+	}
+	
+	private void stopTimer() {
+		paused = true;
+		myHandler.removeCallbacksAndMessages(updateTime);
+	}
+	
 	@Override
 	public void onPause() {
 		super.onPause();
 		
+		stopTimer();
 		closeKeyboard();
+		
+		updateTime.run();
 	}
 	
 	@Override
 	public void onStop() {
 		super.onStop();
 		
+		stopTimer();
 		closeKeyboard();
 	}
 	
@@ -221,6 +286,7 @@ public class MainActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		
+		stopTimer();
 		closeKeyboard();
 		
 		if(db != null) {
@@ -231,20 +297,21 @@ public class MainActivity extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		/*
-		 * Force show the onscreen keyboard.
-		 * Source: http://stackoverflow.com/a/6977565
-		 */
-		((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(
-				InputMethodManager.SHOW_FORCED,
-				InputMethodManager.HIDE_IMPLICIT_ONLY);
-	}
-	
-	/**
-	 * @return the game
-	 */
-	public HangmanGame getGame() {
-		return game;
+		
+		if(!game.getStatus().hasLostGame() && !game.getStatus().hasWonGame()) {
+			paused = false;
+			showCurrentTime();
+		}
+		
+		showKeyboard();
+		
+		if(!game.getStatus().hasLostGame() && !game.getStatus().hasWonGame()) {
+			startTime =
+				SystemClock.elapsedRealtime() - game.getStatus().getTime();
+			myHandler.postDelayed(updateTime, 100);
+		}
+		
+		wordView.requestFocus();
 	}
 	
 	protected void onSaveInstanceState(Bundle outState) {
@@ -253,5 +320,15 @@ public class MainActivity extends Activity {
 		if(game != null) {
 			outState.putSerializable("gameObj", game);
 		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+	 */
+	@Override
+	public void onClick(View v) {
+		showKeyboard();
 	}
 }
