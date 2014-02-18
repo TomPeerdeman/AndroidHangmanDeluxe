@@ -94,14 +94,16 @@ public class EvilGameplay implements GameplayDelegate {
 						new HashMap<String, EquivalenceClass>();
 					String eq;
 					for(String word : words) {
-						// Replace all non guess characters with
-						// GameplayDelegate.UNKNOWN_CHARACTER.
-						eq = equivalize(word, guess);
-						if(eqClasses.containsKey(eq)) {
-							// Increment the number of words for this class
-							eqClasses.get(eq).addWord();
-						} else {
-							eqClasses.put(eq, new EquivalenceClass(eq));
+						if(!evilStatus.containsPrevGuessed(word)) {
+							// Replace all non guess characters with
+							// GameplayDelegate.UNKNOWN_CHARACTER.
+							eq = equivalize(word, guess);
+							if(eqClasses.containsKey(eq)) {
+								// Increment the number of words for this class
+								eqClasses.get(eq).addWord();
+							} else {
+								eqClasses.put(eq, new EquivalenceClass(eq));
+							}
 						}
 					}
 					
@@ -123,10 +125,11 @@ public class EvilGameplay implements GameplayDelegate {
 						lowClass = eqClasses.values().iterator().next();
 					}
 					
-					Log.i("ahd-game", "Low eq class " + lowClass.getEqClass()
-							+ " " + lowClass.getNumWords());
-					
 					if(lowClass != null) {
+						Log.i("ahd-game",
+								"Low eq class " + lowClass.getEqClass() + " "
+										+ lowClass.getNumWords());
+						
 						// Insert the new guess into the old eq class at the
 						// positions of the positions in lowClass.
 						char[] eqArr = evilStatus.getEquivalenceClass();
@@ -143,6 +146,19 @@ public class EvilGameplay implements GameplayDelegate {
 							// Only one word left, so we pick it.
 							evilStatus.setWordChosen(true);
 							
+							words =
+								wordDatabase.getEquivalentWords(new String(
+										eqArr), guess);
+							
+							if(words.size() != 1) {
+								throw new RuntimeException(
+										"The words model gained extra magic words "
+												+ words.size());
+							}
+							
+							evilStatus.setEquivalenceClass(words.get(0)
+																.toCharArray());
+							
 							for(int i = 0; i < eqArr.length; i++) {
 								// The guessed character is in the word.
 								if(eqArr[i] == guess) {
@@ -155,6 +171,8 @@ public class EvilGameplay implements GameplayDelegate {
 					// No words found combined with the current eq class.
 					evilStatus.decrementGuesses();
 				}
+				
+				evilStatus.addPrevGuessedChar(guess);
 			}
 		}
 		

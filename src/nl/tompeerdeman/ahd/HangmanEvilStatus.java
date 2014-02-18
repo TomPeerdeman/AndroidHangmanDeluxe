@@ -13,6 +13,9 @@ import java.io.IOException;
 public class HangmanEvilStatus extends HangmanStatus {
 	private static final long serialVersionUID = 1L;
 	
+	private final char[] prevGuessedChars;
+	private int nPrevGuessedChars;
+	
 	private char[] equivalenceClass;
 	private boolean wordChosen;
 	
@@ -29,6 +32,8 @@ public class HangmanEvilStatus extends HangmanStatus {
 		super(guesses, guessedChars);
 		this.equivalenceClass = equivalenceClass;
 		this.wordChosen = wordChosen;
+		prevGuessedChars = new char[26];
+		nPrevGuessedChars = 0;
 	}
 	
 	/**
@@ -41,6 +46,8 @@ public class HangmanEvilStatus extends HangmanStatus {
 		super(startNumGuesses, (byte) equivalenceClass.length);
 		this.equivalenceClass = equivalenceClass;
 		wordChosen = false;
+		prevGuessedChars = new char[26];
+		nPrevGuessedChars = 0;
 	}
 	
 	/**
@@ -48,6 +55,21 @@ public class HangmanEvilStatus extends HangmanStatus {
 	 */
 	public boolean isWordChosen() {
 		return wordChosen;
+	}
+	
+	public boolean containsPrevGuessed(String word) {
+		int idx;
+		for(int i = 0; i < nPrevGuessedChars; i++) {
+			idx = word.indexOf(prevGuessedChars[i], 0);
+			if(idx >= 0 && word.charAt(idx) != equivalenceClass[idx]) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addPrevGuessedChar(char c) {
+		prevGuessedChars[nPrevGuessedChars++] = c;
 	}
 	
 	/**
