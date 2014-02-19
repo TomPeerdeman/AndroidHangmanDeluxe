@@ -82,7 +82,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		dbOpener = new SQLiteDatabaseOpener(this);
 		try {
-			dbOpener.createDb(this);
+			dbOpener.createDb(this, false);
+			Log.i("ahd-db", "DB created");
 		} catch(IOException e) {
 			e.printStackTrace();
 			finish();
@@ -91,6 +92,25 @@ public class MainActivity extends Activity implements OnClickListener {
 		db = dbOpener.open();
 		
 		wordDatabase = new SQLiteWordsModel(db);
+		
+		// No words, recreate the database from scratch.
+		if(wordDatabase.getNumWords() == 0) {
+			wordDatabase = null;
+			db.close();
+			
+			try {
+				dbOpener.createDb(this, true);
+				Log.i("ahd-db", "DB recreated");
+			} catch(IOException e) {
+				e.printStackTrace();
+				finish();
+				return;
+			}
+			
+			db = dbOpener.open();
+			
+			wordDatabase = new SQLiteWordsModel(db);
+		}
 		
 		Log.i("ahd-db", "Num words in db: " + wordDatabase.getNumWords());
 		Log.i("ahd-db",

@@ -44,6 +44,7 @@ public class SQLiteDatabaseOpener extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		Log.i("ahd-db", "Create db");
 		// Dev code for generating the db.sqlite file in assets.
 		db.execSQL(WORDS_CREATE);
 		db.execSQL(HIGHSCORE_CREATE);
@@ -51,6 +52,7 @@ public class SQLiteDatabaseOpener extends SQLiteOpenHelper {
 	
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		Log.i("ahd-db", "Upgrade db " + oldVersion + " to " + newVersion);
 		// Dev code for generating the db.sqlite file in assets.
 		// Drop & recreate tables.
 		db.execSQL("DROP TABLE IF EXISTS words");
@@ -63,13 +65,14 @@ public class SQLiteDatabaseOpener extends SQLiteOpenHelper {
 	 * Create the db if it doesn't exists.
 	 * 
 	 * @param context
+	 * @param force Force recreate the database
 	 * @throws IOException
 	 */
 	// Java is stupid... Var in is always closed, java says nope.
 	@SuppressWarnings("resource")
-	public void createDb(Context context) throws IOException {
+	public void createDb(Context context, boolean force) throws IOException {
 		File dbFile = context.getDatabasePath(DATABASE_NAME);
-		if(!dbFile.exists()) {
+		if(!dbFile.exists() || force) {
 			InputStream in = null;
 			OutputStream out = null;
 			try {
@@ -95,6 +98,8 @@ public class SQLiteDatabaseOpener extends SQLiteOpenHelper {
 					out.close();
 				}
 			}
+		} else {
+			Log.i("ahd-db", "Database already exists");
 		}
 	}
 	

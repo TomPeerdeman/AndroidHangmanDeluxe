@@ -9,16 +9,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 /**
  * @author Tom Peerdeman
  * 
  */
 public class SettingsActivity extends Activity implements
-		OnSeekBarChangeListener {
+		OnSeekBarChangeListener, RadioGroup.OnCheckedChangeListener,
+		CompoundButton.OnCheckedChangeListener {
+	private HangmanGame game;
+	
 	private TextView maxGuessesView;
 	private TextView minWordLengthView;
 	private TextView maxWordLengthView;
@@ -26,6 +32,9 @@ public class SettingsActivity extends Activity implements
 	private SeekBar maxGuessesBar;
 	private SeekBar minWordLengthBar;
 	private SeekBar maxWordLengthBar;
+	
+	private ToggleButton hideNonAlphaButton;
+	private RadioGroup gameplayRadioGroup;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -41,9 +50,17 @@ public class SettingsActivity extends Activity implements
 		minWordLengthBar = (SeekBar) findViewById(R.id.minWordLengthBar);
 		maxWordLengthBar = (SeekBar) findViewById(R.id.maxWordLengthBar);
 		
+		hideNonAlphaButton =
+			(ToggleButton) findViewById(R.id.hideNonAlphaToggleButton);
+		hideNonAlphaButton.setOnCheckedChangeListener(this);
+		gameplayRadioGroup = (RadioGroup) findViewById(R.id.gameplayRadioGroup);
+		gameplayRadioGroup.setOnCheckedChangeListener(this);
+		
 		maxGuessesBar.setOnSeekBarChangeListener(this);
 		minWordLengthBar.setOnSeekBarChangeListener(this);
 		maxWordLengthBar.setOnSeekBarChangeListener(this);
+		
+		game = HangmanGame.getInstance();
 	}
 	
 	@Override
@@ -128,5 +145,39 @@ public class SettingsActivity extends Activity implements
 	 */
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
+		newSettings();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.widget.RadioGroup.OnCheckedChangeListener#onCheckedChanged(android
+	 * .widget.RadioGroup, int)
+	 */
+	@Override
+	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		newSettings();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.widget.CompoundButton.OnCheckedChangeListener#onCheckedChanged
+	 * (android.widget.CompoundButton, boolean)
+	 */
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		newSettings();
+	}
+	
+	private void newSettings() {
+		game.setSettings(new HangmanSettings(
+				(byte) (maxGuessesBar.getProgress() + 1),
+				(maxWordLengthBar.getProgress() + 1),
+				(minWordLengthBar.getProgress() + 1),
+				!hideNonAlphaButton.isChecked(),
+				(gameplayRadioGroup.getCheckedRadioButtonId() == R.id.evilRadioButton)));
 	}
 }

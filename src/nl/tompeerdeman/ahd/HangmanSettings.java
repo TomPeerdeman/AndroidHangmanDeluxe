@@ -70,4 +70,16 @@ public class HangmanSettings implements Serializable {
 	public boolean isEvil() {
 		return evil;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "HangmanSettings [maxGuesses=" + maxGuesses + ", maxWordLength="
+				+ maxWordLength + ", minWordLength=" + minWordLength
+				+ ", revealNonAlpha=" + revealNonAlpha + ", evil=" + evil + "]";
+	}
 }

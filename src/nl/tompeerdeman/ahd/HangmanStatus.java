@@ -3,6 +3,7 @@ package nl.tompeerdeman.ahd;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import android.util.Log;
 
@@ -143,5 +144,17 @@ public abstract class HangmanStatus implements Serializable {
 		
 		Log.i("ahd-game", "Reveal " + character + " at " + idx + "("
 				+ numRevealed + "/" + guessedChars.length + ")");
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "HangmanStatus [guesses=" + guesses + ", guessedChars="
+				+ Arrays.toString(guessedChars) + ", time=" + time
+				+ ", numRevealed=" + numRevealed + "]";
 	}
 }
