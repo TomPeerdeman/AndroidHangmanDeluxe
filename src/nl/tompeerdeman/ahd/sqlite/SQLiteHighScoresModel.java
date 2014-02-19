@@ -27,19 +27,15 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 		"INSERT INTO highscore (word, bad_guesses, time, game_type) "
 				+ "VALUES (?, ?, ?, 1)";
 	
-	private final static String REMOVE_OVERFLOW_ALL =
-		"DELETE FROM highscore WHERE id IN(SELECT id FROM highscore "
-				+ "ORDER BY time ASC, bad_guesses ASC LIMIT 0 OFFSET "
-				+ MAX_HIGHSCORE_DISPLAY + ")";
 	private final static String REMOVE_OVERFLOW_EVIL =
 		"DELETE FROM highscore WHERE id IN("
 				+ "SELECT id FROM highscore WHERE game_type = 0 "
-				+ "ORDER BY time ASC, bad_guesses ASC LIMIT 0 OFFSET "
+				+ "ORDER BY time ASC, bad_guesses ASC LIMIT -1 OFFSET "
 				+ MAX_HIGHSCORE_DISPLAY + ")";
 	private final static String REMOVE_OVERFLOW_NORMAL =
 		"DELETE FROM highscore WHERE id IN("
 				+ "SELECT id FROM highscore WHERE game_type = 1 "
-				+ "ORDER BY time ASC, bad_guesses ASC LIMIT 0 OFFSET "
+				+ "ORDER BY time ASC, bad_guesses ASC LIMIT -1 OFFSET "
 				+ MAX_HIGHSCORE_DISPLAY + ")";
 	
 	private final static String SELECT_COUNT =
@@ -143,8 +139,6 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 			
 			db.execSQL(REMOVE_OVERFLOW_NORMAL);
 		}
-		
-		db.execSQL(REMOVE_OVERFLOW_ALL);
 		
 		// Saved highscore's are no longer valid. This REQUIRES an reload.
 		loaded = false;

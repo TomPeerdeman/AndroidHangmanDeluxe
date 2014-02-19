@@ -245,18 +245,18 @@ public class MainActivity extends Activity implements OnClickListener {
 				highScoreModel.getHighScorePosition(game.getStatus().getTime());
 			String allPos =
 				"Overall: "
-						+ ((highPos[2] < HighScoresModel.MAX_HIGHSCORE_DISPLAY)
+						+ ((highPos[2] <= HighScoresModel.MAX_HIGHSCORE_DISPLAY)
 							? "position " + highPos[2] : "not listed");
 			String specificPos;
 			if(game.getSettings().isEvil()) {
 				specificPos =
 					"Evil: "
-							+ ((highPos[0] < HighScoresModel.MAX_HIGHSCORE_DISPLAY)
+							+ ((highPos[0] <= HighScoresModel.MAX_HIGHSCORE_DISPLAY)
 								? "position " + highPos[0] : "not listed");
 			} else {
 				specificPos =
 					"Normal: "
-							+ ((highPos[1] < HighScoresModel.MAX_HIGHSCORE_DISPLAY)
+							+ ((highPos[1] <= HighScoresModel.MAX_HIGHSCORE_DISPLAY)
 								? "position " + highPos[1] : "not listed");
 			}
 			
@@ -301,9 +301,11 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	public void onReset() {
 		Log.i("ahd-word", new String(game.getStatus().getGuessedChars()));
-		Log.i("ahd-word",
-				new String(
-						((HangmanEvilStatus) game.getStatus()).getEquivalenceClass()));
+		if(game.getStatus() instanceof HangmanEvilStatus) {
+			Log.i("ahd-word",
+					new String(
+							((HangmanEvilStatus) game.getStatus()).getEquivalenceClass()));
+		}
 		
 		startTime = SystemClock.elapsedRealtime();
 		myHandler.removeCallbacks(updateTime);

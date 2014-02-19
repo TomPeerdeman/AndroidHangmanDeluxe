@@ -4,6 +4,7 @@
  */
 package nl.tompeerdeman.ahd;
 
+import android.util.Log;
 
 /**
  * @author Tom Peerdeman
@@ -26,6 +27,9 @@ public class GoodGameplay implements GameplayDelegate {
 		
 		char[] word = status.getWordChars();
 		char[] revealed = status.getGuessedChars();
+		
+		Log.i("ahd-good", "Word: " + new String(word) + " known "
+				+ new String(revealed));
 		
 		boolean charFound = false;
 		
@@ -58,7 +62,8 @@ public class GoodGameplay implements GameplayDelegate {
 	 * .HangmanSettings, nl.tompeerdeman.ahd.HangmanStatus)
 	 */
 	@Override
-	public HangmanStatus initialize(HangmanSettings settings, WordsModel wordDatabase) {
+	public HangmanStatus initialize(HangmanSettings settings,
+			WordsModel wordDatabase) {
 		if(settings.isEvil()) {
 			throw new IllegalArgumentException(
 					"Initialize nice gameplay but settings say evil gameplay");
