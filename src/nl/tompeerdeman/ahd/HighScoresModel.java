@@ -16,6 +16,8 @@ public abstract class HighScoresModel implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	public final static int MAX_HIGHSCORE_DISPLAY = 10;
+	
 	protected List<HighScoreEntry> highScoresAll;
 	protected List<HighScoreEntry> highScoresEvil;
 	protected List<HighScoreEntry> highScoresNormal;
@@ -54,4 +56,11 @@ public abstract class HighScoresModel implements Serializable {
 	 * @param evil
 	 */
 	public abstract void insertNew(HighScoreEntry entry, boolean evil);
+	
+	/**
+	 * @param time
+	 * @return An array containing the highscore positions of the 3 highscore
+	 *         classes (0: evil, 1: normal, 2: all)
+	 */
+	public abstract int[] getHighScorePosition(long time);
 }

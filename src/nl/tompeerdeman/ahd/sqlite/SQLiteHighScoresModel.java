@@ -11,6 +11,7 @@ import nl.tompeerdeman.ahd.HighScoreEntry;
 import nl.tompeerdeman.ahd.HighScoresModel;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 /**
  * @author Tom Peerdeman
@@ -19,28 +20,26 @@ import android.database.sqlite.SQLiteDatabase;
 public class SQLiteHighScoresModel extends HighScoresModel {
 	private static final long serialVersionUID = 1L;
 	
-	private final static int MAX_HIGHSCORE_DISPLAY = 10;
-	
 	private final static String INSERT_HIGHSCORE_EVIL =
 		"INSERT INTO highscore (word, bad_guesses, time, game_type) "
-				+ "VALUES ('?', ?, ?, 0)";
+				+ "VALUES (?, ?, ?, 0)";
 	private final static String INSERT_HIGHSCORE_NORMAL =
 		"INSERT INTO highscore (word, bad_guesses, time, game_type) "
-				+ "VALUES ('?', ?, ?, 1)";
+				+ "VALUES (?, ?, ?, 1)";
 	
 	private final static String REMOVE_OVERFLOW_ALL =
-		"DELETE FROM highscore WHERE id IN(" + "SELECT id FROM highscore "
-				+ "ORDER BY time DESC, id ASC LIMIT ," + MAX_HIGHSCORE_DISPLAY
+		"DELETE FROM highscore WHERE id IN(SELECT id FROM highscore "
+				+ "ORDER BY time DESC, id ASC LIMIT 0 OFFSET " + MAX_HIGHSCORE_DISPLAY
 				+ ")";
 	private final static String REMOVE_OVERFLOW_EVIL =
 		"DELETE FROM highscore WHERE id IN("
 				+ "SELECT id FROM highscore WHERE game_type = 0 "
-				+ "ORDER BY time DESC, id ASC LIMIT ," + MAX_HIGHSCORE_DISPLAY
+				+ "ORDER BY time DESC, id ASC LIMIT 0 OFFSET " + MAX_HIGHSCORE_DISPLAY
 				+ ")";
 	private final static String REMOVE_OVERFLOW_NORMAL =
 		"DELETE FROM highscore WHERE id IN("
 				+ "SELECT id FROM highscore WHERE game_type = 1 "
-				+ "ORDER BY time DESC, id ASC LIMIT ," + MAX_HIGHSCORE_DISPLAY
+				+ "ORDER BY time DESC, id ASC LIMIT 0 OFFSET " + MAX_HIGHSCORE_DISPLAY
 				+ ")";
 	
 	private final static String SELECT_COUNT =
@@ -51,6 +50,12 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 				+ "ORDER BY time DESC, id ASC LIMIT "
 				+ (2 * MAX_HIGHSCORE_DISPLAY);
 	
+	private final static String SELECT_MIN_HIGHSCORE =
+		"SELECT COUNT(*), game_type FROM highscore WHERE time < ? GROUP BY game_type";
+	
+	private final static String SELECT_MIN_HIGHSCORE_ALL =
+		"SELECT COUNT(*) FROM highscore WHERE time < ?";
+	
 	private final SQLiteDatabase db;
 	
 	/**
@@ -58,11 +63,9 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 	 */
 	public SQLiteHighScoresModel(SQLiteDatabase db) {
 		this.db = db;
-
-		loadHighScore();
 	}
 	
-	private void loadHighScore() {
+	public void loadHighScore() {
 		// Count the amount of highscore entries for normal and evil.
 		Cursor cursor = db.rawQuery(SELECT_COUNT, null);
 		while(cursor.moveToNext()) {
@@ -90,14 +93,15 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 		
 		cursor = db.rawQuery(SELECT_HIGHSCORE, null);
 		highScoresAll =
-			new ArrayList<HighScoreEntry>(Math.min(cursor.getCount(), 10));
+			new ArrayList<HighScoreEntry>(Math.min(cursor.getCount(),
+					MAX_HIGHSCORE_DISPLAY));
 		
 		while(cursor.moveToNext()) {
 			HighScoreEntry entry =
 				new HighScoreEntry(cursor.getString(0), cursor.getInt(1),
 						cursor.getLong(2));
 			
-			if(highScoresAll.size() < 10) {
+			if(highScoresAll.size() < MAX_HIGHSCORE_DISPLAY) {
 				// Add to combined highscore.
 				highScoresAll.add(entry);
 			}
@@ -142,7 +146,37 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 		
 		db.execSQL(REMOVE_OVERFLOW_ALL);
 		
-		// Saved highscore's are no longer valid. 
+		// Saved highscore's are no longer valid.
 		loadHighScore();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.tompeerdeman.ahd.HighScoresModel#getHighScorePosition(long)
+	 */
+	@Override
+	public int[] getHighScorePosition(long time) {
+		int[] ret = new int[3];
+		// In case the table is empty the SELECT_MIN_HIGHSCORE returns nothing.
+		ret[0] = 1;
+		ret[1] = 1;
+		
+		Cursor cursor = db.rawQuery(SELECT_MIN_HIGHSCORE, null);
+		while(cursor.moveToNext()) {
+			ret[cursor.getInt(1)] = cursor.getInt(0) + 1;
+			Log.i("ahd-highscore", "Find highscore " + cursor.getInt(1)
+					+ " val + " + cursor.getInt(0));
+		}
+		cursor.close();
+		
+		cursor = db.rawQuery(SELECT_MIN_HIGHSCORE_ALL, null);
+		if(cursor.moveToNext()) {
+			ret[2] = cursor.getInt(0) + 1;
+			Log.i("ahd-highscore", "Find highscore 0 val + " + cursor.getInt(0));
+		}
+		cursor.close();
+		
+		return ret;
 	}
 }

@@ -62,9 +62,12 @@ public class HangmanEvilStatus extends HangmanStatus {
 	public boolean containsPrevGuessed(String word) {
 		int idx;
 		for(int i = 0; i < nPrevGuessedChars; i++) {
-			idx = 0;
+			idx = -1;
 			do {
-				idx = word.indexOf(prevGuessedChars[i], idx + 1);
+				// Don't check the same letter over and over again.
+				idx++;
+				
+				idx = word.indexOf(prevGuessedChars[i], idx);
 				if(idx >= 0 && word.charAt(idx) != equivalenceClass[idx]) {
 					return true;
 				}

@@ -20,13 +20,14 @@ public class HighScoreEntry implements Serializable {
 	/**
 	 * Construct a highscore entry from the active game
 	 * 
-	 * @param status
-	 * @param settings
+	 * @param game
 	 */
-	public HighScoreEntry(HangmanStatus status, HangmanSettings settings) {
-		word = new String(status.getWordChars());
-		badGuesses = settings.getMaxNumGuesses() - status.getRemainingGuesses();
-		time = status.getTime();
+	public HighScoreEntry(HangmanGame game) {
+		word = new String(game.getStatus().getWordChars());
+		badGuesses =
+			game.getSettings().getMaxNumGuesses()
+					- game.getStatus().getRemainingGuesses();
+		time = game.getStatus().getTime();
 	}
 	
 	/**

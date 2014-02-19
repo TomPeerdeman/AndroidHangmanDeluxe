@@ -8,9 +8,12 @@ import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
 import nl.tompeerdeman.ahd.sqlite.SQLiteDatabaseOpener;
+import nl.tompeerdeman.ahd.sqlite.SQLiteHighScoresModel;
 import nl.tompeerdeman.ahd.sqlite.SQLiteWordsModel;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -38,6 +41,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private SQLiteDatabaseOpener dbOpener;
 	private SQLiteDatabase db;
 	private WordsModel wordDatabase;
+	private HighScoresModel highScoreModel;
 	
 	private HangmanGame game;
 	
@@ -112,6 +116,8 @@ public class MainActivity extends Activity implements OnClickListener {
 			wordDatabase = new SQLiteWordsModel(db);
 		}
 		
+		highScoreModel = new SQLiteHighScoresModel(db);
+		
 		Log.i("ahd-db", "Num words in db: " + wordDatabase.getNumWords());
 		Log.i("ahd-db",
 				"Get rand word: "
@@ -182,6 +188,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		// Handle item selection.
 		switch(item.getItemId()) {
 			case R.id.action_new_game:
+				newGame();
+				
 				return true;
 			case R.id.action_highscore:
 				startActivity(new Intent(this, HighScoreActivity.class));
@@ -196,10 +204,12 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		Log.i("ahd", "Key up " + keyCode);
-		
 		char guess = (char) Character.toUpperCase(event.getUnicodeChar());
-		if(HangmanGame.validChar(guess) && !inputLock.isLocked()) {
+		// Only process valid char's and if we are in the right state.
+		if(HangmanGame.validChar(guess) && !inputLock.isLocked()
+				&& !game.getStatus().hasLostGame()
+				&& !game.getStatus().hasWonGame()) {
+			stopTimer();
 			new HandleInputTask(this).execute(guess);
 		}
 		
@@ -215,9 +225,78 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		if(game.getStatus().hasLostGame()) {
 			stopTimer();
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("You lost!")
+					.setCancelable(false)
+					.setPositiveButton("New game",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									newGame();
+								}
+							});
+			AlertDialog alert = builder.create();
+			alert.show();
 		} else if(game.getStatus().hasWonGame()) {
 			stopTimer();
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			
+			int[] highPos =
+				highScoreModel.getHighScorePosition(game.getStatus().getTime());
+			String allPos =
+				"Overall: "
+						+ ((highPos[2] < HighScoresModel.MAX_HIGHSCORE_DISPLAY)
+							? "position " + highPos[2] : "not listed");
+			String specificPos;
+			if(game.getSettings().isEvil()) {
+				specificPos =
+					"Evil: "
+							+ ((highPos[0] < HighScoresModel.MAX_HIGHSCORE_DISPLAY)
+								? "position " + highPos[0] : "not listed");
+			} else {
+				specificPos =
+					"Normal: "
+							+ ((highPos[1] < HighScoresModel.MAX_HIGHSCORE_DISPLAY)
+								? "position " + highPos[1] : "not listed");
+			}
+			
+			builder.setMessage(
+					"You won!\nDid you make the highscore?\n" + allPos + "\n"
+							+ specificPos)
+					.setCancelable(false)
+					.setPositiveButton("To highscores",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									startActivity(new Intent(MainActivity.this,
+											HighScoreActivity.class));
+								}
+							})
+					.setNegativeButton("New game",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									newGame();
+								}
+							});
+			AlertDialog alert = builder.create();
+			alert.show();
+			
+			// Try to insert the new highscore.
+			highScoreModel.insertNew(new HighScoreEntry(game),
+					game.getSettings().isEvil());
+		} else {
+			onResume();
 		}
+	}
+	
+	private void newGame() {
+		stopTimer();
+		
+		game.initialize(wordDatabase);
+		Log.i("ahd", "Load fresh game");
+		
+		onReset();
 	}
 	
 	public void onReset() {
@@ -234,6 +313,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		showCurrentGuesses();
 		showCurrentTime();
 		
+		paused = false;
 		startTime = SystemClock.elapsedRealtime();
 		myHandler.postDelayed(updateTime, 100);
 	}
