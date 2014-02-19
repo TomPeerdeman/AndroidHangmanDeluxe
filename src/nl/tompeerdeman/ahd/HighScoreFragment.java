@@ -5,7 +5,9 @@
 package nl.tompeerdeman.ahd;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -24,11 +26,18 @@ import android.widget.TextView;
  */
 public class HighScoreFragment extends Fragment {
 	private final static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(
-			"HH:mm:ss:SS", Locale.US);
+			"HH:mm:ss:SSS", Locale.US);
 	
 	static {
 		// We want a difference of time, so no accounting for the timezone.
 		TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+	}
+	
+	private HighScoresModel highScoresModel;
+	public int type;
+	
+	public HighScoreFragment() {
+		highScoresModel = HighScoresModel.getInstance();
 	}
 	
 	@Override
@@ -46,29 +55,55 @@ public class HighScoreFragment extends Fragment {
 		
 		row = (TableRow) inflater.inflate(R.layout.tablerow, rootTable, false);
 		
-		tView = (TextView) row.findViewById(R.id.table_id);
+		tView = (TextView) row.findViewById(R.id.table_word);
 		tView.setText("Word");
 		
-		tView = (TextView) row.findViewById(R.id.table_name);
-		tView.setText("Guesses");
+		tView = (TextView) row.findViewById(R.id.table_badguesses);
+		tView.setText("Bad guesses");
 		
 		tView = (TextView) row.findViewById(R.id.table_time);
 		tView.setText("Time");
 		
 		rootTable.addView(row);
 		
-		for(int i = 0; i < 8; i++) {
+		highScoresModel.ensureLoaded();
+		List<HighScoreEntry> entries;
+		switch(type) {
+			case 0:
+				entries = highScoresModel.getHighScoresEvil();
+				break;
+			case 1:
+				entries = highScoresModel.getHighScoresNormal();
+				break;
+			case 2:
+				entries = highScoresModel.getHighScoresAll();
+				break;
+			default:
+				entries = Collections.emptyList();
+		}
+		
+		for(HighScoreEntry entry : entries) {
 			row =
 				(TableRow) inflater.inflate(R.layout.tablerow, rootTable, false);
 			
-			tView = (TextView) row.findViewById(R.id.table_id);
-			tView.setText("Word " + i);
+			tView = (TextView) row.findViewById(R.id.table_word);
+			tView.setText(entry.getWord());
 			
-			tView = (TextView) row.findViewById(R.id.table_name);
-			tView.setText("" + i);
+			tView = (TextView) row.findViewById(R.id.table_badguesses);
+			tView.setText(String.valueOf(entry.getBadGuesses()));
 			
 			tView = (TextView) row.findViewById(R.id.table_time);
-			tView.setText(TIME_FORMAT.format(new Date(i)));
+			tView.setText(TIME_FORMAT.format(new Date(entry.getTime())));
+			
+			rootTable.addView(row);
+		}
+		
+		if(entries.size() == 0) {
+			row =
+				(TableRow) inflater.inflate(R.layout.tablerow, rootTable, false);
+			
+			tView = (TextView) row.findViewById(R.id.table_word);
+			tView.setText("No entries");
 			
 			rootTable.addView(row);
 		}

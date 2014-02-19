@@ -7,6 +7,7 @@ package nl.tompeerdeman.ahd;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 
 /**
  * @author Tom Peerdeman
@@ -27,7 +28,10 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
 	 */
 	@Override
 	public Fragment getItem(int fragment) {
-		return new HighScoreFragment();
+		HighScoreFragment frag = new HighScoreFragment();
+		Log.i("ahd-highscore", "Create fragment "+ (2-fragment));
+		frag.type = 2-fragment;
+		return frag;
 	}
 	
 	/*

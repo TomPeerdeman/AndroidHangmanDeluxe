@@ -29,25 +29,25 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 	
 	private final static String REMOVE_OVERFLOW_ALL =
 		"DELETE FROM highscore WHERE id IN(SELECT id FROM highscore "
-				+ "ORDER BY time DESC, id ASC LIMIT 0 OFFSET " + MAX_HIGHSCORE_DISPLAY
-				+ ")";
+				+ "ORDER BY time ASC, bad_guesses ASC LIMIT 0 OFFSET "
+				+ MAX_HIGHSCORE_DISPLAY + ")";
 	private final static String REMOVE_OVERFLOW_EVIL =
 		"DELETE FROM highscore WHERE id IN("
 				+ "SELECT id FROM highscore WHERE game_type = 0 "
-				+ "ORDER BY time DESC, id ASC LIMIT 0 OFFSET " + MAX_HIGHSCORE_DISPLAY
-				+ ")";
+				+ "ORDER BY time ASC, bad_guesses ASC LIMIT 0 OFFSET "
+				+ MAX_HIGHSCORE_DISPLAY + ")";
 	private final static String REMOVE_OVERFLOW_NORMAL =
 		"DELETE FROM highscore WHERE id IN("
 				+ "SELECT id FROM highscore WHERE game_type = 1 "
-				+ "ORDER BY time DESC, id ASC LIMIT 0 OFFSET " + MAX_HIGHSCORE_DISPLAY
-				+ ")";
+				+ "ORDER BY time ASC, bad_guesses ASC LIMIT 0 OFFSET "
+				+ MAX_HIGHSCORE_DISPLAY + ")";
 	
 	private final static String SELECT_COUNT =
 		"SELECT COUNT(*), game_type FROM highscore GROUP BY game_type";
 	
 	private final static String SELECT_HIGHSCORE =
 		"SELECT word, bad_guesses, time, game_type FROM highscore "
-				+ "ORDER BY time DESC, id ASC LIMIT "
+				+ "ORDER BY time ASC, bad_guesses ASC LIMIT "
 				+ (2 * MAX_HIGHSCORE_DISPLAY);
 	
 	private final static String SELECT_MIN_HIGHSCORE =
@@ -65,7 +65,7 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 		this.db = db;
 	}
 	
-	public void loadHighScore() {
+	public void load() {
 		// Count the amount of highscore entries for normal and evil.
 		Cursor cursor = db.rawQuery(SELECT_COUNT, null);
 		while(cursor.moveToNext()) {
@@ -146,8 +146,8 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 		
 		db.execSQL(REMOVE_OVERFLOW_ALL);
 		
-		// Saved highscore's are no longer valid.
-		loadHighScore();
+		// Saved highscore's are no longer valid. This REQUIRES an reload.
+		loaded = false;
 	}
 	
 	/*
@@ -157,23 +157,34 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 	 */
 	@Override
 	public int[] getHighScorePosition(long time) {
+		/*
+		 * This method actually ignores the cases the time is exact the same as
+		 * an existing entry.
+		 * When inserting the item and the time happens to be the same, the
+		 * amount of bad_guesses is checked.
+		 */
+		
 		int[] ret = new int[3];
 		// In case the table is empty the SELECT_MIN_HIGHSCORE returns nothing.
 		ret[0] = 1;
 		ret[1] = 1;
 		
-		Cursor cursor = db.rawQuery(SELECT_MIN_HIGHSCORE, null);
+		Cursor cursor =
+			db.rawQuery(SELECT_MIN_HIGHSCORE,
+					new String[] {String.valueOf(time)});
 		while(cursor.moveToNext()) {
 			ret[cursor.getInt(1)] = cursor.getInt(0) + 1;
 			Log.i("ahd-highscore", "Find highscore " + cursor.getInt(1)
-					+ " val + " + cursor.getInt(0));
+					+ " val " + cursor.getInt(0));
 		}
 		cursor.close();
 		
-		cursor = db.rawQuery(SELECT_MIN_HIGHSCORE_ALL, null);
+		cursor =
+			db.rawQuery(SELECT_MIN_HIGHSCORE_ALL,
+					new String[] {String.valueOf(time)});
 		if(cursor.moveToNext()) {
 			ret[2] = cursor.getInt(0) + 1;
-			Log.i("ahd-highscore", "Find highscore 0 val + " + cursor.getInt(0));
+			Log.i("ahd-highscore", "Find highscore 2 val " + cursor.getInt(0));
 		}
 		cursor.close();
 		

@@ -34,9 +34,9 @@ Classes/Interfaces
 	Stores the current status of the hangman game such as characters visible to the user, the to be guessed word and the amount of guesses.
 - GameplayDelegate<br />
 	Interface that provides the methods that the good and evil gameplay should implement:<br />
-	`public HangmanStatus initialize(HangmanSettings settings);`<br />
+	`public HangmanStatus initialize(HangmanSettings settings, WordsModel wordDatabase);`<br />
 		Create a new game (and thus a new status) from the given settings.<br />
-	`public HangmanStatus onGuess(HangmanSettings settings, HangmanStatus status, char guess);`<br />
+	`public HangmanStatus onGuess(HangmanSettings settings, HangmanStatus status, WordsModel wordDatabase, char guess);`<br />
 		Handle a user triggered guess and adapt the current status to the guess.
 - WordsModel<br />
 	Interface that provides methods to get words from the word list using some constraints on the words. The constraints are length in range or a given equivalence class.
@@ -50,7 +50,7 @@ Classes/Interfaces
 #### Activities
 MainActivity.java - the activity that shows and handles the game itself.<br />
 SettingsActivity.java - the activity that shows all the settings and edit's the underlying structure so that the MainActivity can use them.<br />
-HighScoreActivity.java - shows the highscore (10 games that have been won sorted by time to game completion DESC). Has 3 subcategories (tabs), overall, normal and evil. The overall tab shows the best 10 games, wich can be either normal or evil games. The normal tab shows the best 10 normal games. Etc.<br />
+HighScoreActivity.java - shows the highscore (10 games that have been won sorted by time to game completion ASC). Has 3 subcategories (tabs), overall, normal and evil. The overall tab shows the best 10 games, wich can be either normal or evil games. The normal tab shows the best 10 normal games. Etc.<br />
 
 User interface
 ===

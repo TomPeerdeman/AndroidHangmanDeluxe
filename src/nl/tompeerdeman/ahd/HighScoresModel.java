@@ -22,12 +22,15 @@ public abstract class HighScoresModel implements Serializable {
 	protected List<HighScoreEntry> highScoresEvil;
 	protected List<HighScoreEntry> highScoresNormal;
 	
+	protected boolean loaded;
+	
 	public static HighScoresModel getInstance() {
 		return instance;
 	}
 	
 	protected HighScoresModel() {
 		HighScoresModel.instance = this;
+		loaded = false;
 	}
 	
 	/**
@@ -50,6 +53,14 @@ public abstract class HighScoresModel implements Serializable {
 	public List<HighScoreEntry> getHighScoresNormal() {
 		return highScoresNormal;
 	}
+	
+	public void ensureLoaded() {
+		if(!loaded) {
+			load();
+		}
+	}
+	
+	protected abstract void load();
 	
 	/**
 	 * @param entry
