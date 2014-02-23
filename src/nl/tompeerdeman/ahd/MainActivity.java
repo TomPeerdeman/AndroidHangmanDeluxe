@@ -95,6 +95,30 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		wordDatabase = new SQLiteWordsModel(db);
 		
+		/*
+		 * Dev code. Load words from XML into the database.
+		 * Since this is too slow the whole database is copied from the assets
+		 * intead.
+		 * 
+		 * Empty word list?
+		 * if(wordDatabase.getRandWordInLengthRange(1, 26) == null) {
+		 * try {
+		 * WordListReader reader =
+		 * // new WordFileWordListReader(this, "words.dat");
+		 * new WebWordListReader(this,
+		 * "http://tompeerdeman.nl/words.xml");
+		 * Log.i("ahd", "Starting word read");
+		 * if(reader.execute(wordDatabase) == null) {
+		 * throw new Exception("Word download failed");
+		 * }
+		 * } catch(Exception e) {
+		 * e.printStackTrace();
+		 * finish();
+		 * return;
+		 * }
+		 * }
+		 */
+		
 		// No words, recreate the database from scratch.
 		if(wordDatabase.getNumWords() == 0) {
 			wordDatabase = null;
@@ -114,24 +138,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		
 		highScoreModel = new SQLiteHighScoresModel(db);
-		
-		// Empty word list?
-		// if(wordDatabase.getRandWordInLengthRange(1, 26) == null) {
-		// try {
-		// WordListReader reader =
-		// // new WordFileWordListReader(this, "words.dat");
-		// new WebWordListReader(this,
-		// "http://tompeerdeman.nl/words.xml");
-		// Log.i("ahd", "Starting word read");
-		// if(reader.execute(wordDatabase) == null) {
-		// throw new Exception("Word download failed");
-		// }
-		// } catch(Exception e) {
-		// e.printStackTrace();
-		// finish();
-		// return;
-		// }
-		// }
 		
 		if(savedInstanceState != null
 				&& savedInstanceState.containsKey("gameObj")) {
@@ -287,7 +293,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		onReset();
 	}
 	
-	public void onReset() {	
+	public void onReset() {
 		startTime = SystemClock.elapsedRealtime();
 		myHandler.removeCallbacks(updateTime);
 		game.getStatus().setTime(0);
