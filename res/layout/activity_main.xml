@@ -66,4 +66,14 @@
         android:focusableInTouchMode="false"
         android:text="@string/openKeyboard" />
 
+    <ImageView
+        android:id="@+id/statusImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/imageViewContentDescriptor"
+        android:minHeight="100dp"
+        android:minWidth="100dp" />
+
 </RelativeLayout>

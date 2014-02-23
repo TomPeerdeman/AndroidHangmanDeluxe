@@ -5,8 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import android.util.Log;
-
 /**
  * @author Tom Peerdeman
  * 
@@ -141,9 +139,6 @@ public abstract class HangmanStatus implements Serializable {
 		
 		guessedChars[idx] = character;
 		numRevealed++;
-		
-		Log.i("ahd-game", "Reveal " + character + " at " + idx + "("
-				+ numRevealed + "/" + guessedChars.length + ")");
 	}
 	
 	/*

@@ -16,6 +16,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -26,6 +28,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -47,6 +50,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	private TextView wordView;
 	private TextView guessesView;
 	private TextView timeView;
+	
+	private ImageView imageView;
+	private HangmanDrawable statusDrawable;
 	
 	private ReentrantLock inputLock;
 	private boolean paused;
@@ -78,6 +84,15 @@ public class MainActivity extends Activity implements OnClickListener {
 		wordView = (TextView) findViewById(R.id.wordTextView);
 		guessesView = (TextView) findViewById(R.id.guessesTextView);
 		timeView = (TextView) findViewById(R.id.timeTextView);
+		
+		imageView = (ImageView) findViewById(R.id.statusImageView);
+		
+		Bitmap mainBitmap =
+			BitmapFactory.decodeResource(getResources(),
+					R.drawable.hangman_stand);
+		
+		statusDrawable = new HangmanDrawable(mainBitmap);
+		imageView.setImageDrawable(statusDrawable);
 		
 		((Button) findViewById(R.id.openKeyboardButton)).setOnClickListener(this);
 		
@@ -218,10 +233,25 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		wordView.requestFocus();
 		
+		// Set new progress level (0%-100%).
+		statusDrawable.setLevel(100 - (int) Math.round((double) 100.0
+				* ((double) game.getStatus().getRemainingGuesses() / (double) game.getSettings()
+																					.getMaxNumGuesses())));
+		// Redraw the visualization of the status.
+		statusDrawable.invalidateSelf();
+		
 		if(game.getStatus().hasLostGame()) {
 			stopTimer();
+			char[] wordChars = game.getStatus().getWordChars();
+			String msg = "You lost!";
+			
+			// Show the word if it was chosen.
+			if(wordChars != null) {
+				msg += "\n\nThe word was: \n" + new String(wordChars);
+			}
+			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("You lost!")
+			builder.setMessage(msg)
 					.setCancelable(false)
 					.setPositiveButton("New game",
 							new DialogInterface.OnClickListener() {
@@ -301,6 +331,25 @@ public class MainActivity extends Activity implements OnClickListener {
 		showCurrentWord();
 		showCurrentGuesses();
 		showCurrentTime();
+		
+		Bitmap secBitmap;
+		int offsX;
+		int offsY;
+		if(game.getSettings().isEvil()) {
+			secBitmap =
+				BitmapFactory.decodeResource(getResources(), R.drawable.apple);
+			offsX = -2;
+			offsY = 7;
+		} else {
+			secBitmap =
+				BitmapFactory.decodeResource(getResources(), R.drawable.android);
+			offsX = 0;
+			offsY = -3;
+		}
+		
+		statusDrawable.setSecBitmap(secBitmap, offsX, offsY);
+		statusDrawable.setLevel(0);
+		statusDrawable.invalidateSelf();
 		
 		paused = false;
 		startTime = SystemClock.elapsedRealtime();
