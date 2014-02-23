@@ -21,54 +21,60 @@ import nl.tompeerdeman.ahd.WordsModel;
  */
 public class GoodGameplayTest extends TestCase {
 	private GoodGameplay game;
+	private WordsModel db = new WordsModel() {
+		@Override
+		public void insertWord(String word) {
+			throw new RuntimeException("Insert not allowed");
+		}
+		
+		@Override
+		public String getRandWordInLengthRange(int minLength, int maxLength) {
+			return "Word with spaces";
+		}
+		
+		@Override
+		public List<String> getEquivalentWords(String like, char contains) {
+			return Collections.emptyList();
+		}
+		
+		@Override
+		public int getNumWords() {
+			return 0;
+		}
+	};
 	
 	@Override
 	public void setUp() {
-		WordsModel db = new WordsModel() {
-			@Override
-			public void insertWord(String word) {
-				throw new RuntimeException("Insert not allowed");
-			}
-			
-			@Override
-			public String getRandWordInLengthRange(int minLength, int maxLength) {
-				return "Word with spaces";
-			}
-			
-			@Override
-			public List<String> getEquivalentWords(String like, char contains) {
-				return Collections.emptyList();
-			}
-		};
-		
-		game = new GoodGameplay(db);
+		game = new GoodGameplay();
 	}
 	
 	/**
 	 * Test method for
-	 * {@link nl.tompeerdeman.ahd.GoodGameplay#onGuess(nl.tompeerdeman.ahd.HangmanSettings, nl.tompeerdeman.ahd.HangmanStatus, char)}
+	 * {@link nl.tompeerdeman.ahd.GoodGameplay#onGuess(nl.tompeerdeman.ahd.HangmanSettings, nl.tompeerdeman.ahd.HangmanStatus, nl.tompeerdeman.ahd.WordsModel, char)}
 	 * .
 	 */
 	public void testOnGuess() {
-		
+		// TODO: Implement
 	}
 	
 	/**
 	 * Test method for
-	 * {@link nl.tompeerdeman.ahd.GoodGameplay#initialize(nl.tompeerdeman.ahd.HangmanSettings)}
+	 * {@link nl.tompeerdeman.ahd.GoodGameplay#initialize(nl.tompeerdeman.ahd.HangmanSettings, nl.tompeerdeman.ahd.WordsModel)}
 	 * .
 	 */
 	public void testInitialize() {
 		
 		try {
-			game.initialize(new HangmanSettings((byte) 6, 1, 26, false, true));
+			game.initialize(new HangmanSettings((byte) 6, 1, 26, false, true),
+					db);
 			fail("Initialize evil on good game succeeded");
 		} catch(IllegalArgumentException e) {
 			
 		}
 		
 		HangmanStatus status =
-			game.initialize(new HangmanSettings((byte) 6, 1, 26, false, false));
+			game.initialize(new HangmanSettings((byte) 6, 1, 26, false, false),
+					db);
 		assertNotNull(status);
 		assertFalse(status.hasLostGame());
 		assertFalse(status.hasWonGame());
@@ -82,7 +88,8 @@ public class GoodGameplayTest extends TestCase {
 		assertTrue(Arrays.equals(status.getGuessedChars(), wordChars));
 		
 		status =
-			game.initialize(new HangmanSettings((byte) 6, 1, 26, true, false));
+			game.initialize(new HangmanSettings((byte) 6, 1, 26, true, false),
+					db);
 		assertEquals(wordChars.length, origWord.length());
 		assertFalse(Arrays.equals(status.getGuessedChars(), wordChars));
 	}

@@ -1,5 +1,6 @@
 package nl.tompeerdeman.ahd;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -502,7 +503,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				game = game_tmp;
 				game.onLoad();
 			}
-			
+		} catch(FileNotFoundException dontcare) {
 		} catch(IOException e) {
 			e.printStackTrace();
 		} catch(ClassNotFoundException dontcare) {
