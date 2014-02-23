@@ -1,6 +1,8 @@
 package nl.tompeerdeman.ahd;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -55,8 +57,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	private HangmanDrawable statusDrawable;
 	
 	private ReentrantLock inputLock;
-	private boolean paused;
 	
+	private boolean paused;
 	private Handler myHandler;
 	private long startTime;
 	private Runnable updateTime = new Runnable() {
@@ -153,38 +155,63 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		
 		highScoreModel = new SQLiteHighScoresModel(db);
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
 		
-		if(savedInstanceState != null
-				&& savedInstanceState.containsKey("gameObj")) {
-			game = (HangmanGame) savedInstanceState.getSerializable("gameObj");
-			game.onLoad();
-		} else {
-			game = new HangmanGame();
-			game.initialize(wordDatabase);
+		stopTimer();
+		closeKeyboard();
+		
+		updateTime.run();
+	}
+	
+	@Override
+	public void onStart() {
+		super.onStart();
+		
+		openKeyboard();
+		
+		if(game == null) {
+			readGameStatus();
+			
+			if(game == null) {
+				game = new HangmanGame();
+				game.initialize(wordDatabase);
+			}
+			onReset();
 		}
+	}
+	
+	@Override
+	public void onStop() {
+		super.onStop();
 		
-		onReset();
+		stopTimer();
+		closeKeyboard();
+		
+		writeGameStatus();
 	}
 	
-	/**
-	 * @return the inputLock
-	 */
-	public ReentrantLock getInputLock() {
-		return inputLock;
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		
+		stopTimer();
+		closeKeyboard();
+		
+		if(db != null) {
+			db.close();
+		}
 	}
 	
-	/**
-	 * @return the wordDatabase
-	 */
-	public WordsModel getWordDatabase() {
-		return wordDatabase;
-	}
-	
-	/**
-	 * @return the game
-	 */
-	public HangmanGame getGame() {
-		return game;
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		openKeyboard();
+		showPausedDialog();
 	}
 	
 	@Override
@@ -199,7 +226,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		// Handle item selection.
 		switch(item.getItemId()) {
 			case R.id.action_new_game:
-				newGame();
+				newGame(true);
 				
 				return true;
 			case R.id.action_highscore:
@@ -241,7 +268,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		statusDrawable.invalidateSelf();
 		
 		if(game.getStatus().hasLostGame()) {
-			stopTimer();
 			char[] wordChars = game.getStatus().getWordChars();
 			String msg = "You lost!";
 			
@@ -257,13 +283,12 @@ public class MainActivity extends Activity implements OnClickListener {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-									newGame();
+									newGame(false);
 								}
 							});
 			AlertDialog alert = builder.create();
 			alert.show();
 		} else if(game.getStatus().hasWonGame()) {
-			stopTimer();
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			
 			int[] highPos =
@@ -301,7 +326,7 @@ public class MainActivity extends Activity implements OnClickListener {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-									newGame();
+									newGame(false);
 								}
 							});
 			AlertDialog alert = builder.create();
@@ -311,23 +336,28 @@ public class MainActivity extends Activity implements OnClickListener {
 			highScoreModel.insertNew(new HighScoreEntry(game),
 					game.getSettings().isEvil());
 		} else {
-			onGameResume();
+			resumeTimer();
 		}
 	}
 	
-	private void newGame() {
+	private void newGame(boolean pause) {
 		stopTimer();
 		
+		// Reset game status & settings.
 		game.initialize(wordDatabase);
 		
+		// Reset timer.
+		startTime = SystemClock.elapsedRealtime();
+		
 		onReset();
+		openKeyboard();
+		if(pause)
+			showPausedDialog();
+		else
+			startTimer();
 	}
 	
 	public void onReset() {
-		startTime = SystemClock.elapsedRealtime();
-		myHandler.removeCallbacks(updateTime);
-		game.getStatus().setTime(0);
-		
 		showCurrentWord();
 		showCurrentGuesses();
 		showCurrentTime();
@@ -348,12 +378,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		
 		statusDrawable.setSecBitmap(secBitmap, offsX, offsY);
+		
+		// Reset status drawing & redraw.
 		statusDrawable.setLevel(0);
 		statusDrawable.invalidateSelf();
-		
-		paused = false;
-		startTime = SystemClock.elapsedRealtime();
-		myHandler.postDelayed(updateTime, 100);
 	}
 	
 	public void showCurrentWord() {
@@ -387,7 +415,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				wordView.getWindowToken(), 0);
 	}
 	
-	private void showKeyboard() {
+	private void openKeyboard() {
 		/*
 		 * Force show the onscreen keyboard.
 		 * Source: http://stackoverflow.com/a/6977565
@@ -395,6 +423,49 @@ public class MainActivity extends Activity implements OnClickListener {
 		((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(
 				InputMethodManager.SHOW_FORCED,
 				InputMethodManager.HIDE_IMPLICIT_ONLY);
+		
+		wordView.requestFocus();
+	}
+	
+	private void showPausedDialog() {
+		stopTimer();
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		
+		if(!game.getStatus().hasLostGame() && !game.getStatus().hasWonGame()) {
+			builder.setMessage("Game paused")
+					.setCancelable(false)
+					.setPositiveButton("Resume",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									resumeTimer();
+								}
+							});
+			
+		} else {
+			builder.setMessage("Game finished")
+					.setCancelable(false)
+					.setPositiveButton("New game",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									newGame(false);
+								}
+							});
+		}
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	private void startTimer() {
+		paused = false;
+		myHandler.postDelayed(updateTime, 100);
+	}
+	
+	private void resumeTimer() {
+		startTime = SystemClock.elapsedRealtime() - game.getStatus().getTime();
+		startTimer();
 	}
 	
 	private void stopTimer() {
@@ -402,64 +473,46 @@ public class MainActivity extends Activity implements OnClickListener {
 		myHandler.removeCallbacksAndMessages(updateTime);
 	}
 	
-	private void onGameResume() {
-		if(!game.getStatus().hasLostGame() && !game.getStatus().hasWonGame()) {
-			paused = false;
-			showCurrentTime();
-		}
-		
-		showKeyboard();
-		
-		if(!game.getStatus().hasLostGame() && !game.getStatus().hasWonGame()) {
-			startTime =
-				SystemClock.elapsedRealtime() - game.getStatus().getTime();
-			myHandler.postDelayed(updateTime, 100);
-		}
-		
-		wordView.requestFocus();
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		
-		stopTimer();
-		closeKeyboard();
-		
-		updateTime.run();
-	}
-	
-	@Override
-	public void onStop() {
-		super.onStop();
-		
-		stopTimer();
-		closeKeyboard();
-	}
-	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		
-		stopTimer();
-		closeKeyboard();
-		
-		if(db != null) {
-			db.close();
+	private void writeGameStatus() {
+		ObjectOutputStream objOut = null;
+		try {
+			objOut =
+				new ObjectOutputStream(openFileOutput("game.ser",
+						Context.MODE_PRIVATE));
+			objOut.writeObject(game);
+		} catch(IOException e) {
+			e.printStackTrace();
+		} finally {
+			if(objOut != null) {
+				try {
+					objOut.flush();
+					objOut.close();
+				} catch(IOException dontcare) {
+				}
+			}
 		}
 	}
 	
-	@Override
-	public void onResume() {
-		super.onResume();
-		
-		onGameResume();
-	}
-	
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if(game != null) {
-			outState.putSerializable("gameObj", game);
+	private void readGameStatus() {
+		ObjectInputStream objIn = null;
+		try {
+			objIn = new ObjectInputStream(openFileInput("game.ser"));
+			HangmanGame game_tmp = (HangmanGame) objIn.readObject();
+			if(game_tmp != null) {
+				game = game_tmp;
+				game.onLoad();
+			}
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		} catch(ClassNotFoundException dontcare) {
+		} finally {
+			if(objIn != null) {
+				try {
+					objIn.close();
+				} catch(IOException dontcare) {
+				}
+			}
 		}
 	}
 	
@@ -470,6 +523,27 @@ public class MainActivity extends Activity implements OnClickListener {
 	 */
 	@Override
 	public void onClick(View v) {
-		showKeyboard();
+		openKeyboard();
+	}
+	
+	/**
+	 * @return the inputLock
+	 */
+	public ReentrantLock getInputLock() {
+		return inputLock;
+	}
+	
+	/**
+	 * @return the wordDatabase
+	 */
+	public WordsModel getWordDatabase() {
+		return wordDatabase;
+	}
+	
+	/**
+	 * @return the game
+	 */
+	public HangmanGame getGame() {
+		return game;
 	}
 }

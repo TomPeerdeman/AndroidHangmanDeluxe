@@ -6,6 +6,8 @@ package nl.tompeerdeman.ahd;
 
 import java.io.Serializable;
 
+import android.util.Log;
+
 /**
  * @author Tom Peerdeman
  * 
@@ -53,6 +55,8 @@ public class HangmanGame implements Serializable {
 			settings = HangmanSettings.getDefaultSettings();
 		}
 		
+		Log.i("ahd-game", "Initialize settings " + settings + " " + Integer.toHexString(hashCode()));
+		
 		// Create the gameplay delegate based on the settings.
 		if(gameplayDelegate == null) {
 			if(settings.isEvil()) {
@@ -75,6 +79,8 @@ public class HangmanGame implements Serializable {
 	 * Initialize a game that has been loaded from storage.
 	 */
 	public void onLoad() {
+		HangmanGame.instance = this;
+		
 		// Create the gameplay delegate based on the settings.
 		if(settings.isEvil()) {
 			gameplayDelegate = new EvilGameplay();

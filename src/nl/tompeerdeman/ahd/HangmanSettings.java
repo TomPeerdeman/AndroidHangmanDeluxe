@@ -78,7 +78,8 @@ public class HangmanSettings implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "HangmanSettings [maxGuesses=" + maxGuesses + ", maxWordLength="
+		return "HangmanSettings " + Integer.toHexString(hashCode())
+				+ "[maxGuesses=" + maxGuesses + ", maxWordLength="
 				+ maxWordLength + ", minWordLength=" + minWordLength
 				+ ", revealNonAlpha=" + revealNonAlpha + ", evil=" + evil + "]";
 	}
