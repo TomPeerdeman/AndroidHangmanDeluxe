@@ -36,6 +36,8 @@ public class SettingsActivity extends Activity implements
 	private ToggleButton hideNonAlphaButton;
 	private RadioGroup gameplayRadioGroup;
 	
+	private boolean loaded;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,27 @@ public class SettingsActivity extends Activity implements
 		maxWordLengthBar.setOnSeekBarChangeListener(this);
 		
 		game = HangmanGame.getInstance();
+		
+		/* Indicate settings changes should not result in a new settings object
+		 * since the statements below cause them to be called as well.
+		 */
+		loaded = false;
+		
+		if(game.getSettings().isEvil()) {
+			gameplayRadioGroup.check(R.id.evilRadioButton);
+		} else {
+			gameplayRadioGroup.check(R.id.niceRadioButton);
+		}
+		
+		hideNonAlphaButton.setChecked(!game.getSettings()
+											.shouldRevealNonAlpha());
+		
+		maxGuessesBar.setProgress(game.getSettings().getMaxNumGuesses() - 1);
+		minWordLengthBar.setProgress(game.getSettings().getMinWordLength() - 1);
+		maxWordLengthBar.setProgress(game.getSettings().getMaxWordLength() - 1);
+		
+		// Setting changes should be processed again.
+		loaded = true;
 	}
 	
 	@Override
@@ -96,32 +119,30 @@ public class SettingsActivity extends Activity implements
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress,
 			boolean fromUser) {
-		if(fromUser) {
-			switch(seekBar.getId()) {
-				case R.id.maxGuessesBar:
-					maxGuessesView.setText("Maximum guesses: " + (progress + 1));
-					break;
-				case R.id.maxWordLengthBar:
-					if(progress < minWordLengthBar.getProgress()) {
-						minWordLengthBar.setProgress(progress);
-						minWordLengthView.setText("Minimum word length: "
-								+ (progress + 1));
-					}
-					
-					maxWordLengthView.setText("Maximum word length: "
-							+ (progress + 1));
-					break;
-				case R.id.minWordLengthBar:
-					if(progress > maxWordLengthBar.getProgress()) {
-						maxWordLengthBar.setProgress(progress);
-						maxWordLengthView.setText("Maximum word length: "
-								+ (progress + 1));
-					}
-					
+		switch(seekBar.getId()) {
+			case R.id.maxGuessesBar:
+				maxGuessesView.setText("Maximum guesses: " + (progress + 1));
+				break;
+			case R.id.maxWordLengthBar:
+				if(progress < minWordLengthBar.getProgress() && fromUser) {
+					minWordLengthBar.setProgress(progress);
 					minWordLengthView.setText("Minimum word length: "
 							+ (progress + 1));
-					break;
-			}
+				}
+				
+				maxWordLengthView.setText("Maximum word length: "
+						+ (progress + 1));
+				break;
+			case R.id.minWordLengthBar:
+				if(progress > maxWordLengthBar.getProgress() && fromUser) {
+					maxWordLengthBar.setProgress(progress);
+					maxWordLengthView.setText("Maximum word length: "
+							+ (progress + 1));
+				}
+				
+				minWordLengthView.setText("Minimum word length: "
+						+ (progress + 1));
+				break;
 		}
 	}
 	
@@ -145,7 +166,9 @@ public class SettingsActivity extends Activity implements
 	 */
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
-		newSettings();
+		if(loaded) {
+			newSettings();
+		}
 	}
 	
 	/*
@@ -157,7 +180,9 @@ public class SettingsActivity extends Activity implements
 	 */
 	@Override
 	public void onCheckedChanged(RadioGroup group, int checkedId) {
-		newSettings();
+		if(loaded) {
+			newSettings();
+		}
 	}
 	
 	/*
@@ -169,7 +194,9 @@ public class SettingsActivity extends Activity implements
 	 */
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		newSettings();
+		if(loaded) {
+			newSettings();
+		}
 	}
 	
 	private void newSettings() {
