@@ -6,8 +6,6 @@ package nl.tompeerdeman.ahd;
 
 import java.io.Serializable;
 
-import android.util.Log;
-
 /**
  * @author Tom Peerdeman
  * 
@@ -34,7 +32,7 @@ public class HangmanGame implements Serializable {
 	 * @return True if the character is in the a-z range
 	 */
 	public static boolean validChar(char character) {
-		return (character <= 'Z' && character >= 'A');
+		return(character <= 'Z' && character >= 'A');
 	}
 	
 	public HangmanGame() {
@@ -115,7 +113,6 @@ public class HangmanGame implements Serializable {
 	 *            the settings to set
 	 */
 	public void setSettings(HangmanSettings settings) {
-		Log.i("ahd-game", "New settings: " + settings);
 		this.newSettings = settings;
 	}
 	

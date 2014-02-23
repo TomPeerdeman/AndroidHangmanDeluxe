@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import android.util.Log;
-
 /**
  * @author Tom Peerdeman
  * 
@@ -46,8 +44,6 @@ public class EvilGameplay implements GameplayDelegate {
 			
 			char[] word = evilStatus.getWordChars();
 			char[] revealed = evilStatus.getGuessedChars();
-			Log.i("ahd-game", "Word chosen: " + new String(word)
-					+ "; Current: " + new String(revealed));
 			
 			boolean charFound = false;
 			for(int i = 0; i < word.length; i++) {
@@ -58,7 +54,6 @@ public class EvilGameplay implements GameplayDelegate {
 				
 				// The guessed character is in the word.
 				if(word[i] == guess) {
-					Log.i("ahd-game", "Found guessed char at idx " + i);
 					charFound = true;
 					evilStatus.reveal(i, guess);
 				}
@@ -76,7 +71,6 @@ public class EvilGameplay implements GameplayDelegate {
 				List<String> words =
 					wordDatabase.getEquivalentWords(
 							new String(evilStatus.getEquivalenceClass()), guess);
-				Log.i("ahd-game", "Get equivalent words: " + words.size());
 				if(words.size() == 1
 						&& !evilStatus.containsPrevGuessed(words.get(0))) {
 					// Only one word left, so we pick it.
@@ -99,8 +93,6 @@ public class EvilGameplay implements GameplayDelegate {
 							// Replace all non guess characters with
 							// GameplayDelegate.UNKNOWN_CHARACTER.
 							eq = equivalize(word, guess);
-							Log.i("ahd-word", "Equivalize " + word + " -> "
-									+ eq);
 							if(eqClasses.containsKey(eq)) {
 								// Increment the number of words for this class
 								eqClasses.get(eq).addWord();
@@ -109,8 +101,6 @@ public class EvilGameplay implements GameplayDelegate {
 							}
 						}
 					}
-					
-					Log.i("ahd-game", "Num eq classes " + eqClasses.size());
 					
 					EquivalenceClass highClass = null;
 					if(eqClasses.size() > 1) {
@@ -128,11 +118,7 @@ public class EvilGameplay implements GameplayDelegate {
 						highClass = eqClasses.values().iterator().next();
 					}
 					
-					if(highClass != null) {
-						Log.i("ahd-game",
-								"Low eq class " + highClass.getEqClass() + " "
-										+ highClass.getNumWords());
-						
+					if(highClass != null) {			
 						// Insert the new guess into the old eq class at the
 						// positions of the positions in lowClass.
 						char[] eqArr = evilStatus.getEquivalenceClass();
@@ -189,8 +175,6 @@ public class EvilGameplay implements GameplayDelegate {
 		String word =
 			wordDatabase.getRandWordInLengthRange(settings.getMinWordLength(),
 					settings.getMaxWordLength());
-		
-		Log.i("ahd-evil", "Set word length " + word.length());
 		
 		// Build equivalence class
 		char[] eqClass = new char[word.length()];

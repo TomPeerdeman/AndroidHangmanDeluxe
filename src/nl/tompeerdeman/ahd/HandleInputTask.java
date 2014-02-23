@@ -6,7 +6,6 @@ package nl.tompeerdeman.ahd;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.util.Log;
 
 /**
  * @author Tom Peerdeman
@@ -52,13 +51,5 @@ public class HandleInputTask extends AsyncTask<Character, Void, Void> {
 		}
 		
 		main.onKeyCallback();
-		
-		if(main.getGame().getStatus().hasLostGame()) {
-			Log.i("ahd-word", "You lost!");
-		}
-		
-		if(main.getGame().getStatus().hasWonGame()) {
-			Log.i("ahd-word", "You won!");
-		}
 	}
 }

@@ -11,7 +11,6 @@ import nl.tompeerdeman.ahd.HighScoreEntry;
 import nl.tompeerdeman.ahd.HighScoresModel;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 /**
  * @author Tom Peerdeman
@@ -168,8 +167,6 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 					new String[] {String.valueOf(time)});
 		while(cursor.moveToNext()) {
 			ret[cursor.getInt(1)] = cursor.getInt(0) + 1;
-			Log.i("ahd-highscore", "Find highscore " + cursor.getInt(1)
-					+ " val " + cursor.getInt(0));
 		}
 		cursor.close();
 		
@@ -178,7 +175,6 @@ public class SQLiteHighScoresModel extends HighScoresModel {
 					new String[] {String.valueOf(time)});
 		if(cursor.moveToNext()) {
 			ret[2] = cursor.getInt(0) + 1;
-			Log.i("ahd-highscore", "Find highscore 2 val " + cursor.getInt(0));
 		}
 		cursor.close();
 		

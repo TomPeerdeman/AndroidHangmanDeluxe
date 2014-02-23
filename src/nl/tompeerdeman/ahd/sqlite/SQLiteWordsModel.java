@@ -11,7 +11,6 @@ import java.util.List;
 import nl.tompeerdeman.ahd.WordsModel;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 /**
  * @author Tom Peerdeman
@@ -43,12 +42,10 @@ public class SQLiteWordsModel implements WordsModel {
 	 */
 	@Override
 	public List<String> getEquivalentWords(String like, char contains) {
-		Log.i("ahd-db", "Get words like " + like);
 		Cursor cursor =
 			db.rawQuery(SELECT_EQUIVALENT,
-					new String[] {like, "%"+ String.valueOf(contains) + "%"});
+					new String[] {like, "%" + String.valueOf(contains) + "%"});
 		int count = cursor.getCount();
-		Log.i("ahd-db", "LIKE Result " + count);
 		
 		if(count == 0) {
 			cursor.close();

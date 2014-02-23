@@ -19,7 +19,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -80,14 +79,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		guessesView = (TextView) findViewById(R.id.guessesTextView);
 		timeView = (TextView) findViewById(R.id.timeTextView);
 		
-		((Button) findViewById(R.id.button1)).setOnClickListener(this);
+		((Button) findViewById(R.id.openKeyboardButton)).setOnClickListener(this);
 		
 		wordView.requestFocus();
 		
 		dbOpener = new SQLiteDatabaseOpener(this);
 		try {
 			dbOpener.createDb(this, false);
-			Log.i("ahd-db", "DB created");
 		} catch(IOException e) {
 			e.printStackTrace();
 			finish();
@@ -104,7 +102,6 @@ public class MainActivity extends Activity implements OnClickListener {
 			
 			try {
 				dbOpener.createDb(this, true);
-				Log.i("ahd-db", "DB recreated");
 			} catch(IOException e) {
 				e.printStackTrace();
 				finish();
@@ -117,11 +114,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		
 		highScoreModel = new SQLiteHighScoresModel(db);
-		
-		Log.i("ahd-db", "Num words in db: " + wordDatabase.getNumWords());
-		Log.i("ahd-db",
-				"Get rand word: "
-						+ wordDatabase.getRandWordInLengthRange(1, 26));
 		
 		// Empty word list?
 		// if(wordDatabase.getRandWordInLengthRange(1, 26) == null) {
@@ -145,11 +137,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				&& savedInstanceState.containsKey("gameObj")) {
 			game = (HangmanGame) savedInstanceState.getSerializable("gameObj");
 			game.onLoad();
-			Log.i("ahd", "Load game from bundle");
 		} else {
 			game = new HangmanGame();
 			game.initialize(wordDatabase);
-			Log.i("ahd", "Load fresh game");
 		}
 		
 		onReset();
@@ -217,7 +207,6 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 	
 	public void onKeyCallback() {
-		Log.i("ahd-word", new String(game.getStatus().getGuessedChars()));
 		showCurrentGuesses();
 		showCurrentWord();
 		
@@ -286,7 +275,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			highScoreModel.insertNew(new HighScoreEntry(game),
 					game.getSettings().isEvil());
 		} else {
-			onResume();
+			onGameResume();
 		}
 	}
 	
@@ -294,19 +283,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		stopTimer();
 		
 		game.initialize(wordDatabase);
-		Log.i("ahd", "Load fresh game");
 		
 		onReset();
 	}
 	
-	public void onReset() {
-		Log.i("ahd-word", new String(game.getStatus().getGuessedChars()));
-		if(game.getStatus() instanceof HangmanEvilStatus) {
-			Log.i("ahd-word",
-					new String(
-							((HangmanEvilStatus) game.getStatus()).getEquivalenceClass()));
-		}
-		
+	public void onReset() {	
 		startTime = SystemClock.elapsedRealtime();
 		myHandler.removeCallbacks(updateTime);
 		game.getStatus().setTime(0);
@@ -366,6 +347,23 @@ public class MainActivity extends Activity implements OnClickListener {
 		myHandler.removeCallbacksAndMessages(updateTime);
 	}
 	
+	private void onGameResume() {
+		if(!game.getStatus().hasLostGame() && !game.getStatus().hasWonGame()) {
+			paused = false;
+			showCurrentTime();
+		}
+		
+		showKeyboard();
+		
+		if(!game.getStatus().hasLostGame() && !game.getStatus().hasWonGame()) {
+			startTime =
+				SystemClock.elapsedRealtime() - game.getStatus().getTime();
+			myHandler.postDelayed(updateTime, 100);
+		}
+		
+		wordView.requestFocus();
+	}
+	
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -400,25 +398,11 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onResume() {
 		super.onResume();
 		
-		if(!game.getStatus().hasLostGame() && !game.getStatus().hasWonGame()) {
-			paused = false;
-			showCurrentTime();
-		}
-		
-		showKeyboard();
-		
-		if(!game.getStatus().hasLostGame() && !game.getStatus().hasWonGame()) {
-			startTime =
-				SystemClock.elapsedRealtime() - game.getStatus().getTime();
-			myHandler.postDelayed(updateTime, 100);
-		}
-		
-		wordView.requestFocus();
+		onGameResume();
 	}
 	
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		Log.i("ahd", "Save called!");
 		if(game != null) {
 			outState.putSerializable("gameObj", game);
 		}

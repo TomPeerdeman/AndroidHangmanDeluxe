@@ -4,8 +4,6 @@
  */
 package nl.tompeerdeman.ahd;
 
-import android.util.Log;
-
 /**
  * @author Tom Peerdeman
  * 
@@ -27,9 +25,6 @@ public class GoodGameplay implements GameplayDelegate {
 		
 		char[] word = status.getWordChars();
 		char[] revealed = status.getGuessedChars();
-		
-		Log.i("ahd-good", "Word: " + new String(word) + " known "
-				+ new String(revealed));
 		
 		boolean charFound = false;
 		
