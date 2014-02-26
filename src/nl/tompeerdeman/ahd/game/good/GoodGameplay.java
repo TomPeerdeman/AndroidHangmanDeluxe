@@ -29,6 +29,10 @@ public class GoodGameplay implements GameplayDelegate {
 			throw new IllegalArgumentException("Guessed char not in a-z range");
 		}
 		
+		if(status.isPrevGuessedChar(guess)) {
+			return status;
+		}
+		
 		char[] word = status.getWordChars();
 		char[] revealed = status.getGuessedChars();
 		
@@ -40,17 +44,18 @@ public class GoodGameplay implements GameplayDelegate {
 				break;
 			}
 			
-			// The guessed character is in the word.
 			if(word[i] == guess) {
 				charFound = true;
 				status.reveal(i, guess);
 			}
 		}
 		
-		// Did not found the guessed character or already guessed this one.
+		// Did not found the guessed character.
 		if(!charFound) {
 			status.decrementGuesses();
 		}
+		
+		status.addPrevGuessedChar(guess);
 		
 		return status;
 	}

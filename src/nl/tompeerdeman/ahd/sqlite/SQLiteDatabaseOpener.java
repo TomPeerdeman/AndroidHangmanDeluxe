@@ -58,18 +58,32 @@ public class SQLiteDatabaseOpener extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Create the db if it doesn't exists.
+	 * Create the db if the database file does not exists yet, or the creation
+	 * is forced.
+	 * If the database file does not exists it and its parent directory
+	 * structure is created.
+	 * The file is then copied from the assets folder.
 	 * 
 	 * @param context
 	 * @param force
 	 *            Force recreate the database
 	 * @throws IOException
 	 */
-	// Java is stupid... Var in is always closed, java says nope.
+	// Java is stupid... Var 'in' is always closed, java/eclipse says not.
 	@SuppressWarnings("resource")
 	public void createDb(Context context, boolean force) throws IOException {
 		File dbFile = context.getDatabasePath(DATABASE_NAME);
 		if(!dbFile.exists() || force) {
+			if(!dbFile.exists()) {
+				/*
+				 * Android thinks the database file is a directory since the
+				 * file has no extension. To create the required directories we
+				 * have to grab the parent directory and make sure it exists.
+				 */
+				dbFile.getParentFile().mkdirs();
+				dbFile.createNewFile();
+			}
+			
 			InputStream in = null;
 			OutputStream out = null;
 			try {

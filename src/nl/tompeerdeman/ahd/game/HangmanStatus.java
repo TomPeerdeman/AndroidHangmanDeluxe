@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 
-
 /**
  * @author Tom Peerdeman
  * 
@@ -15,6 +14,9 @@ public abstract class HangmanStatus implements Serializable {
 	
 	protected byte guesses;
 	protected char[] guessedChars;
+	
+	protected final char[] prevGuessedChars;
+	protected int nPrevGuessedChars;
 	
 	protected long time;
 	
@@ -37,6 +39,9 @@ public abstract class HangmanStatus implements Serializable {
 		for(int i = 0; i < numCharacters; i++) {
 			guessedChars[i] = GameplayDelegate.CHARACTER_UNKNOWN;
 		}
+		
+		prevGuessedChars = new char[26];
+		nPrevGuessedChars = 0;
 	}
 	
 	/**
@@ -49,9 +54,20 @@ public abstract class HangmanStatus implements Serializable {
 		this.guesses = guesses;
 		this.guessedChars = guessedChars;
 		
+		prevGuessedChars = new char[26];
+		nPrevGuessedChars = 0;
+		
 		onLoad();
 	}
 	
+	/**
+	 * Deserialization. Read the object and calculate the number of revealed
+	 * characters.
+	 * 
+	 * @param in
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	private void readObject(ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		in.defaultReadObject();
@@ -140,6 +156,32 @@ public abstract class HangmanStatus implements Serializable {
 		
 		guessedChars[idx] = character;
 		numRevealed++;
+	}
+	
+	/**
+	 * Add a character that should be added to the list containing characters
+	 * that have already been guessed.
+	 * 
+	 * @param c
+	 */
+	public void addPrevGuessedChar(char c) {
+		prevGuessedChars[nPrevGuessedChars++] = c;
+	}
+	
+	/**
+	 * Check if the supplied character is already guessed in an previous guess.
+	 * 
+	 * @param c
+	 * @return True if the character has already been guessed before, otherwise
+	 *         false
+	 */
+	public boolean isPrevGuessedChar(char c) {
+		for(int i = 0; i < nPrevGuessedChars; i++) {
+			if(prevGuessedChars[i] == c) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/*

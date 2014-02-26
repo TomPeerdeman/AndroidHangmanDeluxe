@@ -15,9 +15,6 @@ import nl.tompeerdeman.ahd.game.HangmanStatus;
 public class HangmanEvilStatus extends HangmanStatus {
 	private static final long serialVersionUID = 1L;
 	
-	private final char[] prevGuessedChars;
-	private int nPrevGuessedChars;
-	
 	private char[] equivalenceClass;
 	private boolean wordChosen;
 	
@@ -34,8 +31,6 @@ public class HangmanEvilStatus extends HangmanStatus {
 		super(guesses, guessedChars);
 		this.equivalenceClass = equivalenceClass;
 		this.wordChosen = wordChosen;
-		prevGuessedChars = new char[26];
-		nPrevGuessedChars = 0;
 	}
 	
 	/**
@@ -48,8 +43,6 @@ public class HangmanEvilStatus extends HangmanStatus {
 		super(startNumGuesses, (byte) equivalenceClass.length);
 		this.equivalenceClass = equivalenceClass;
 		wordChosen = false;
-		prevGuessedChars = new char[26];
-		nPrevGuessedChars = 0;
 	}
 	
 	/**
@@ -76,11 +69,9 @@ public class HangmanEvilStatus extends HangmanStatus {
 		return false;
 	}
 	
-	public void addPrevGuessedChar(char c) {
-		prevGuessedChars[nPrevGuessedChars++] = c;
-	}
-	
 	/**
+	 * Set a flag that indicates that the final word has been chosen.
+	 * 
 	 * @param b
 	 */
 	public void setWordChosen(boolean b) {
@@ -92,14 +83,6 @@ public class HangmanEvilStatus extends HangmanStatus {
 		in.defaultReadObject();
 		
 		onLoad();
-	}
-	
-	/**
-	 * @param equivalenceClassStr
-	 *            The equivalenceClass to set in String form
-	 */
-	public void setEquivalenceClass(String equivalenceClassStr) {
-		setEquivalenceClass(equivalenceClassStr.toCharArray());
 	}
 	
 	/**
@@ -115,19 +98,6 @@ public class HangmanEvilStatus extends HangmanStatus {
 	 */
 	public char[] getEquivalenceClass() {
 		return equivalenceClass;
-	}
-	
-	/**
-	 * @param character
-	 * @return True if the character is in the eq class
-	 */
-	public boolean eqClassContains(char character) {
-		for(int i = 0; i < equivalenceClass.length; i++) {
-			if(equivalenceClass[i] == character) {
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	/*

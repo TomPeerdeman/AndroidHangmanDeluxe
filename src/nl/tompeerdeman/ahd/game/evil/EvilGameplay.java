@@ -43,6 +43,10 @@ public class EvilGameplay implements GameplayDelegate {
 			throw new IllegalArgumentException("Guessed char not in a-z range");
 		}
 		
+		if(status.isPrevGuessedChar(guess)) {
+			return status;
+		}
+		
 		HangmanEvilStatus evilStatus = (HangmanEvilStatus) status;
 		
 		if(evilStatus.isWordChosen()) {
@@ -70,89 +74,83 @@ public class EvilGameplay implements GameplayDelegate {
 				evilStatus.decrementGuesses();
 			}
 		} else {
-			if(evilStatus.eqClassContains(guess)) {
-				// Character already guessed, ignore.
-				evilStatus.decrementGuesses();
-			} else {
-				List<String> words =
-					wordDatabase.getEquivalentWords(
-							new String(evilStatus.getEquivalenceClass()), guess);
-				if(words.size() == 1
-						&& !evilStatus.containsPrevGuessed(words.get(0))) {
-					// Only one word left, so we pick it.
-					char[] word = words.get(0).toCharArray();
-					evilStatus.setEquivalenceClass(word);
-					evilStatus.setWordChosen(true);
-					
-					for(int i = 0; i < word.length; i++) {
-						// The guessed character is in the word.
-						if(word[i] == guess) {
+			List<String> words =
+				wordDatabase.getEquivalentWords(
+						new String(evilStatus.getEquivalenceClass()), guess);
+			if(words.size() == 1
+					&& !evilStatus.containsPrevGuessed(words.get(0))) {
+				// Only one word left, so we pick it.
+				char[] word = words.get(0).toCharArray();
+				evilStatus.setEquivalenceClass(word);
+				evilStatus.setWordChosen(true);
+				
+				for(int i = 0; i < word.length; i++) {
+					if(word[i] == guess) {
+						evilStatus.reveal(i, guess);
+					}
+				}
+			} else if(words.size() > 1) {
+				Map<String, EquivalenceClass> eqClasses =
+					new HashMap<String, EquivalenceClass>();
+				String eq;
+				for(String word : words) {
+					if(!evilStatus.containsPrevGuessed(word)) {
+						// Replace all non guess characters with
+						// GameplayDelegate.UNKNOWN_CHARACTER.
+						eq = equivalize(word, guess);
+						if(eqClasses.containsKey(eq)) {
+							// Increment the number of words for this class
+							eqClasses.get(eq).addWord();
+						} else {
+							eqClasses.put(eq, new EquivalenceClass(eq, word));
+						}
+					}
+				}
+				
+				EquivalenceClass highClass = null;
+				if(eqClasses.size() > 1) {
+					// Get the class with the lowest score.
+					int highScore = 0;
+					for(EquivalenceClass q : eqClasses.values()) {
+						int score = q.getScore(guess);
+						if(score > highScore) {
+							highScore = score;
+							highClass = q;
+						}
+					}
+				} else if(eqClasses.size() == 1) {
+					// Get the only class.
+					highClass = eqClasses.values().iterator().next();
+				}
+				
+				if(highClass != null) {
+					// Insert the new guess into the old eq class at the
+					// positions of the positions in lowClass.
+					char[] eqArr = evilStatus.getEquivalenceClass();
+					for(int i = 0; i < eqArr.length; i++) {
+						if(highClass.getEqClass().charAt(i) == guess) {
+							eqArr[i] = guess;
 							evilStatus.reveal(i, guess);
 						}
 					}
-				} else if(words.size() > 1) {
-					Map<String, EquivalenceClass> eqClasses =
-						new HashMap<String, EquivalenceClass>();
-					String eq;
-					for(String word : words) {
-						if(!evilStatus.containsPrevGuessed(word)) {
-							// Replace all non guess characters with
-							// GameplayDelegate.UNKNOWN_CHARACTER.
-							eq = equivalize(word, guess);
-							if(eqClasses.containsKey(eq)) {
-								// Increment the number of words for this class
-								eqClasses.get(eq).addWord();
-							} else {
-								eqClasses.put(eq, new EquivalenceClass(eq, word));
-							}
-						}
-					}
 					
-					EquivalenceClass highClass = null;
-					if(eqClasses.size() > 1) {
-						// Get the class with the lowest score.
-						int highScore = 0;
-						for(EquivalenceClass q : eqClasses.values()) {
-							int score = q.getScore(guess);
-							if(score > highScore) {
-								highScore = score;
-								highClass = q;
-							}
-						}
-					} else if(eqClasses.size() == 1) {
-						// Get the only class.
-						highClass = eqClasses.values().iterator().next();
-					}
+					evilStatus.setEquivalenceClass(eqArr);
 					
-					if(highClass != null) {			
-						// Insert the new guess into the old eq class at the
-						// positions of the positions in lowClass.
-						char[] eqArr = evilStatus.getEquivalenceClass();
-						for(int i = 0; i < eqArr.length; i++) {
-							if(highClass.getEqClass().charAt(i) == guess) {
-								eqArr[i] = guess;
-								evilStatus.reveal(i, guess);
-							}
-						}
+					if(highClass.getNumWords() == 1) {
+						// Only one word left, so we pick it.
+						evilStatus.setWordChosen(true);
 						
-						evilStatus.setEquivalenceClass(eqArr);
-						
-						if(highClass.getNumWords() == 1) {
-							// Only one word left, so we pick it.
-							evilStatus.setWordChosen(true);
-							
-							evilStatus.setEquivalenceClass(highClass.getFirstWord()
-																	.toCharArray());
-						}
+						evilStatus.setEquivalenceClass(highClass.getFirstWord()
+																.toCharArray());
 					}
-				} else {
-					// No words found combined with the current eq class.
-					evilStatus.decrementGuesses();
 				}
-				
-				evilStatus.addPrevGuessedChar(guess);
+			} else {
+				// No words found combined with the current eq class.
+				evilStatus.decrementGuesses();
 			}
 		}
+		
+		evilStatus.addPrevGuessedChar(guess);
 		
 		return evilStatus;
 	}
@@ -197,7 +195,7 @@ public class EvilGameplay implements GameplayDelegate {
 		
 		/**
 		 * @param eqClass
-		 * @param firstWord 
+		 * @param firstWord
 		 */
 		public EquivalenceClass(String eqClass, String firstWord) {
 			this.eqClass = eqClass;
