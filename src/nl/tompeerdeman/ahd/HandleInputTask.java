@@ -4,6 +4,7 @@
  */
 package nl.tompeerdeman.ahd;
 
+import nl.tompeerdeman.ahd.game.HangmanGame;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 

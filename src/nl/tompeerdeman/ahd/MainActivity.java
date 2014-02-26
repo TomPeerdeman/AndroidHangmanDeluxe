@@ -10,6 +10,11 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
+import nl.tompeerdeman.ahd.game.HangmanGame;
+import nl.tompeerdeman.ahd.game.WordsModel;
+import nl.tompeerdeman.ahd.highsore.HighScoreActivity;
+import nl.tompeerdeman.ahd.highsore.HighScoreEntry;
+import nl.tompeerdeman.ahd.highsore.HighScoresModel;
 import nl.tompeerdeman.ahd.sqlite.SQLiteDatabaseOpener;
 import nl.tompeerdeman.ahd.sqlite.SQLiteHighScoresModel;
 import nl.tompeerdeman.ahd.sqlite.SQLiteWordsModel;

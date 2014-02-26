@@ -2,7 +2,13 @@
  * File: GoodGameplay.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.game.good;
+
+import nl.tompeerdeman.ahd.game.GameplayDelegate;
+import nl.tompeerdeman.ahd.game.HangmanGame;
+import nl.tompeerdeman.ahd.game.HangmanSettings;
+import nl.tompeerdeman.ahd.game.HangmanStatus;
+import nl.tompeerdeman.ahd.game.WordsModel;
 
 /**
  * @author Tom Peerdeman

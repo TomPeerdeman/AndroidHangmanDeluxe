@@ -2,7 +2,7 @@
  * File: HighScoreFragment.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.highsore;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -10,6 +10,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import nl.tompeerdeman.ahd.R;
+import nl.tompeerdeman.ahd.R.id;
+import nl.tompeerdeman.ahd.R.layout;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

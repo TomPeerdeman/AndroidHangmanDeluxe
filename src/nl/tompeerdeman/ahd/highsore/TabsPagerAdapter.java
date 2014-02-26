@@ -2,7 +2,7 @@
  * File: TabsPagerAdapter.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.highsore;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

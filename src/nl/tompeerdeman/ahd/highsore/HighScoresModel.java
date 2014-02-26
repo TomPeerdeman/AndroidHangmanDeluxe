@@ -2,7 +2,7 @@
  * File: HighScore.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.highsore;
 
 import java.io.Serializable;
 import java.util.List;

@@ -2,7 +2,9 @@
  * File: HangmanGoodStatus.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.game.good;
+
+import nl.tompeerdeman.ahd.game.HangmanStatus;
 
 /**
  * @author Tom Peerdeman

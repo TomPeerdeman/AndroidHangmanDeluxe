@@ -4,6 +4,9 @@
  */
 package nl.tompeerdeman.ahd;
 
+import nl.tompeerdeman.ahd.game.HangmanGame;
+import nl.tompeerdeman.ahd.game.HangmanSettings;
+import nl.tompeerdeman.ahd.highsore.HighScoreActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

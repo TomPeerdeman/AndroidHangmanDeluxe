@@ -9,11 +9,11 @@ import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
-import nl.tompeerdeman.ahd.GameplayDelegate;
-import nl.tompeerdeman.ahd.GoodGameplay;
-import nl.tompeerdeman.ahd.HangmanSettings;
-import nl.tompeerdeman.ahd.HangmanStatus;
-import nl.tompeerdeman.ahd.WordsModel;
+import nl.tompeerdeman.ahd.game.GameplayDelegate;
+import nl.tompeerdeman.ahd.game.HangmanSettings;
+import nl.tompeerdeman.ahd.game.HangmanStatus;
+import nl.tompeerdeman.ahd.game.WordsModel;
+import nl.tompeerdeman.ahd.game.good.GoodGameplay;
 
 /**
  * @author Tom Peerdeman
@@ -50,7 +50,7 @@ public class GoodGameplayTest extends TestCase {
 	
 	/**
 	 * Test method for
-	 * {@link nl.tompeerdeman.ahd.GoodGameplay#onGuess(nl.tompeerdeman.ahd.HangmanSettings, nl.tompeerdeman.ahd.HangmanStatus, nl.tompeerdeman.ahd.WordsModel, char)}
+	 * {@link nl.tompeerdeman.ahd.game.good.GoodGameplay#onGuess(nl.tompeerdeman.ahd.game.HangmanSettings, nl.tompeerdeman.ahd.game.HangmanStatus, nl.tompeerdeman.ahd.game.WordsModel, char)}
 	 * .
 	 */
 	public void testOnGuess() {
@@ -59,7 +59,7 @@ public class GoodGameplayTest extends TestCase {
 	
 	/**
 	 * Test method for
-	 * {@link nl.tompeerdeman.ahd.GoodGameplay#initialize(nl.tompeerdeman.ahd.HangmanSettings, nl.tompeerdeman.ahd.WordsModel)}
+	 * {@link nl.tompeerdeman.ahd.game.good.GoodGameplay#initialize(nl.tompeerdeman.ahd.game.HangmanSettings, nl.tompeerdeman.ahd.game.WordsModel)}
 	 * .
 	 */
 	public void testInitialize() {

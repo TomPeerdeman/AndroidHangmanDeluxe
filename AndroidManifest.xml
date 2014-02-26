@@ -29,7 +29,7 @@
         </activity>
         <activity android:name="nl.tompeerdeman.ahd.SettingsActivity" >
         </activity>
-        <activity android:name="nl.tompeerdeman.ahd.HighScoreActivity" >
+        <activity android:name="nl.tompeerdeman.ahd.highsore.HighScoreActivity" >
         </activity>
     </application>
 

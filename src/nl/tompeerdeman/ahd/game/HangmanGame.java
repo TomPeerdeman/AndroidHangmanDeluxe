@@ -2,9 +2,12 @@
  * File: HangmanGame.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.game;
 
 import java.io.Serializable;
+
+import nl.tompeerdeman.ahd.game.evil.EvilGameplay;
+import nl.tompeerdeman.ahd.game.good.GoodGameplay;
 
 /**
  * @author Tom Peerdeman

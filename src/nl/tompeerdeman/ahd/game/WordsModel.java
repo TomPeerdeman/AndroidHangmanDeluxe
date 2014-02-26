@@ -2,7 +2,7 @@
  * File: WordDatabank.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.game;
 
 import java.util.List;
 

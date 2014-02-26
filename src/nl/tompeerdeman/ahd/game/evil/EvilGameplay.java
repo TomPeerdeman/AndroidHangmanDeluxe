@@ -2,13 +2,19 @@
  * File: EvilGameplay.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.game.evil;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import nl.tompeerdeman.ahd.game.GameplayDelegate;
+import nl.tompeerdeman.ahd.game.HangmanGame;
+import nl.tompeerdeman.ahd.game.HangmanSettings;
+import nl.tompeerdeman.ahd.game.HangmanStatus;
+import nl.tompeerdeman.ahd.game.WordsModel;
 
 /**
  * @author Tom Peerdeman

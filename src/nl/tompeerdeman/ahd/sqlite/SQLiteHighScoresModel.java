@@ -7,8 +7,8 @@ package nl.tompeerdeman.ahd.sqlite;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import nl.tompeerdeman.ahd.HighScoreEntry;
-import nl.tompeerdeman.ahd.HighScoresModel;
+import nl.tompeerdeman.ahd.highsore.HighScoreEntry;
+import nl.tompeerdeman.ahd.highsore.HighScoresModel;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 

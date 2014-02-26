@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import nl.tompeerdeman.ahd.WordsModel;
+import nl.tompeerdeman.ahd.game.WordsModel;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 

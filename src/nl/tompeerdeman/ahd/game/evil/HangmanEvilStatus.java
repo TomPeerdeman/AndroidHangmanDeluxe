@@ -2,9 +2,11 @@
  * File: HangmanEvilStatus.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.game.evil;
 
 import java.io.IOException;
+
+import nl.tompeerdeman.ahd.game.HangmanStatus;
 
 /**
  * @author Tom Peerdeman

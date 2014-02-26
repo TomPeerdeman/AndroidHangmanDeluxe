@@ -1,4 +1,5 @@
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.game;
+
 
 /**
  * @author Tom Peerdeman

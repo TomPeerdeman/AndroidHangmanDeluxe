@@ -1,4 +1,4 @@
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.game;
 
 import java.io.Serializable;
 

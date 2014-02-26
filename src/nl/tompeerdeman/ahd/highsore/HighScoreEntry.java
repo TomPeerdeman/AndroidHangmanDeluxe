@@ -2,9 +2,11 @@
  * File: HighScoreEntry.java
  * Author: Tom Peerdeman
  */
-package nl.tompeerdeman.ahd;
+package nl.tompeerdeman.ahd.highsore;
 
 import java.io.Serializable;
+
+import nl.tompeerdeman.ahd.game.HangmanGame;
 
 /**
  * @author Tom Peerdeman
