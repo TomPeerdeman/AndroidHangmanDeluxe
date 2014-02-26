@@ -2,7 +2,7 @@
 <resources>
     <integer name="maxNumGuesses">25</integer>
     <integer name="defaultNumGuesses">5</integer>
-    <integer name="maxWordLength">25</integer>
+    <integer name="maxWordLength">23</integer>
     <integer name="minWordLengthProgress">2</integer>
     <integer name="maxWordLengthProgress">11</integer>
 </resources>
