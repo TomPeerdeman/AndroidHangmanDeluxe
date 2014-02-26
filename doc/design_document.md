@@ -12,7 +12,7 @@ The database used is android's built in SQLite database.
 
 PRIMARY KEY on id.
 
-The time is specified in seconds.
+The time is specified in milliseconds.
 
 #### Word's
 The words.xml file is read and all words are stored in this database.
@@ -42,21 +42,21 @@ Classes/Interfaces
 	Interface that provides methods to get words from the word list using some constraints on the words. The constraints are length in range or a given equivalence class.
 	Also provides methods to insert words into the word list.
 	This will be implemented using SQLite.
-- HighScoresModel<br />
-	Simple list of highscore entry's.
 - HighScoreEntry<br />
 	Data structure that holds the word, the amount of bad guesses and the time.
+- HighScoresModel<br />
+	Model for storing the highscore entries. This will be implemented using SQLite. This provides methods to request all the highscore's, insert new highscore's and determine the position of new highscores.
 
 #### Activities
 MainActivity.java - the activity that shows and handles the game itself.<br />
 SettingsActivity.java - the activity that shows all the settings and edit's the underlying structure so that the MainActivity can use them.<br />
-HighScoreActivity.java - shows the highscore (10 games that have been won sorted by time to game completion ASC). Has 3 subcategories (tabs), overall, normal and evil. The overall tab shows the best 10 games, wich can be either normal or evil games. The normal tab shows the best 10 normal games. Etc.<br />
+HighScoreActivity.java - shows the highscore (10 games that have been won sorted by time to game completion ASC). Has 3 subcategories (tabs), overall, normal and evil. The overall tab shows the best 10 games, wich can be either normal or evil games. The normal tab shows the best 10 normal games. Etc. The tabs are implemented using [fragments](http://developer.android.com/guide/components/fragments.html).<br />
 
 User interface
 ===
 #### Main game
 See [game UI](game_ui.png). This UI should always display the onboard keyboard. The time counts up and pauses if the app is paused or the settings or highhscore activity is opened. The guesses left shows the amount of guesses left vs the maximum amount of bad guesses.
-The background of the app will react on the amount af guesses left. With all guesses left the background will be green. If all guesses are used the background is red. 
+A visualization of the amount of guesses left is shown by a classic hangman drawing. If all the guesses are left nothing is shown on the hanging stand. If no guesses are left the object is shown completely. The object that is being hung depends on the game type.
 The menu contains 3 items:
 - New game
 - Settings
