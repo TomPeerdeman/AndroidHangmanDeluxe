@@ -12,9 +12,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import nl.tompeerdeman.ahd.R;
-import nl.tompeerdeman.ahd.R.id;
-import nl.tompeerdeman.ahd.R.layout;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;

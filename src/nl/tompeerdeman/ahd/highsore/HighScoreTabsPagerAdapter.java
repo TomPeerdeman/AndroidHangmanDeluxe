@@ -12,11 +12,11 @@ import android.support.v4.app.FragmentPagerAdapter;
  * @author Tom Peerdeman
  * 
  */
-public class TabsPagerAdapter extends FragmentPagerAdapter {
+public class HighScoreTabsPagerAdapter extends FragmentPagerAdapter {
 	/**
 	 * @param fm
 	 */
-	public TabsPagerAdapter(FragmentManager fm) {
+	public HighScoreTabsPagerAdapter(FragmentManager fm) {
 		super(fm);
 	}
 	

@@ -6,9 +6,6 @@ package nl.tompeerdeman.ahd.highsore;
 
 import nl.tompeerdeman.ahd.R;
 import nl.tompeerdeman.ahd.SettingsActivity;
-import nl.tompeerdeman.ahd.R.id;
-import nl.tompeerdeman.ahd.R.layout;
-import nl.tompeerdeman.ahd.R.menu;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -28,7 +25,7 @@ import android.view.MenuItem;
 public class HighScoreActivity extends ActionBarActivity implements
 		TabListener, OnPageChangeListener {
 	private ViewPager viewPager;
-	private TabsPagerAdapter mAdapter;
+	private HighScoreTabsPagerAdapter mAdapter;
 	private ActionBar actionBar;
 	
 	private final String[] TABS = {"Overall", "Normal", "Evil"};
@@ -42,7 +39,7 @@ public class HighScoreActivity extends ActionBarActivity implements
 		// Initilization
 		viewPager = (ViewPager) findViewById(R.id.pager);
 		actionBar = getSupportActionBar();
-		mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
+		mAdapter = new HighScoreTabsPagerAdapter(getSupportFragmentManager());
 		
 		viewPager.setAdapter(mAdapter);
 		actionBar.setHomeButtonEnabled(false);
