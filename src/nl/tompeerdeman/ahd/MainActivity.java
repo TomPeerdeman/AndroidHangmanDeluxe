@@ -27,8 +27,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,30 +62,14 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	private ReentrantLock inputLock;
 	
-	private boolean paused;
-	private Handler myHandler;
-	private long startTime;
-	private Runnable updateTime = new Runnable() {
-		public void run() {
-			if(paused) {
-				return;
-			}
-			
-			game.getStatus().setTime(SystemClock.elapsedRealtime() - startTime);
-			showCurrentTime();
-			
-			myHandler.postDelayed(updateTime, 100);
-		}
-	};
-	
+	private HangmanTimer timer;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
 		inputLock = new ReentrantLock();
-		myHandler = new Handler();
-		paused = false;
 		
 		wordView = (TextView) findViewById(R.id.wordTextView);
 		guessesView = (TextView) findViewById(R.id.guessesTextView);
@@ -161,16 +143,16 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		
 		highScoreModel = new SQLiteHighScoresModel(db);
+		
+		timer = new HangmanTimer(this);
 	}
 	
 	@Override
 	public void onPause() {
 		super.onPause();
 		
-		stopTimer();
+		timer.stopTimer();
 		closeKeyboard();
-		
-		updateTime.run();
 	}
 	
 	@Override
@@ -194,7 +176,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onStop() {
 		super.onStop();
 		
-		stopTimer();
+		timer.stopTimer();
 		closeKeyboard();
 		
 		writeGameStatus();
@@ -204,7 +186,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onDestroy() {
 		super.onDestroy();
 		
-		stopTimer();
+		timer.stopTimer();
 		closeKeyboard();
 		
 		if(db != null) {
@@ -253,7 +235,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		if(HangmanGame.validChar(guess) && !inputLock.isLocked()
 				&& !game.getStatus().hasLostGame()
 				&& !game.getStatus().hasWonGame()) {
-			stopTimer();
+			timer.stopTimer();
 			new HandleInputTask(this).execute(guess);
 		}
 		
@@ -342,25 +324,22 @@ public class MainActivity extends Activity implements OnClickListener {
 			highScoreModel.insertNew(new HighScoreEntry(game),
 					game.getSettings().isEvil());
 		} else {
-			resumeTimer();
+			timer.startTimer();
 		}
 	}
 	
 	private void newGame(boolean pause) {
-		stopTimer();
+		timer.stopTimer();
 		
 		// Reset game status & settings.
 		game.initialize(wordDatabase);
-		
-		// Reset timer.
-		startTime = SystemClock.elapsedRealtime();
 		
 		onReset();
 		openKeyboard();
 		if(pause)
 			showPausedDialog();
 		else
-			startTimer();
+			timer.startTimer();
 	}
 	
 	public void onReset() {
@@ -434,7 +413,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 	
 	private void showPausedDialog() {
-		stopTimer();
+		timer.stopTimer();
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		
@@ -445,7 +424,7 @@ public class MainActivity extends Activity implements OnClickListener {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-									resumeTimer();
+									timer.startTimer();
 								}
 							});
 			
@@ -462,21 +441,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		AlertDialog alert = builder.create();
 		alert.show();
-	}
-	
-	private void startTimer() {
-		paused = false;
-		myHandler.postDelayed(updateTime, 100);
-	}
-	
-	private void resumeTimer() {
-		startTime = SystemClock.elapsedRealtime() - game.getStatus().getTime();
-		startTimer();
-	}
-	
-	private void stopTimer() {
-		paused = true;
-		myHandler.removeCallbacksAndMessages(updateTime);
 	}
 	
 	private void writeGameStatus() {
