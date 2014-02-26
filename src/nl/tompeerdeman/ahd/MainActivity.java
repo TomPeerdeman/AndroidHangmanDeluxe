@@ -63,7 +63,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ReentrantLock inputLock;
 	
 	private HangmanTimer timer;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -105,14 +105,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		 * Since this is too slow the whole database is copied from the assets
 		 * intead.
 		 * 
-		 * Empty word list?
+		 * // Empty word list?
 		 * if(wordDatabase.getRandWordInLengthRange(1, 26) == null) {
 		 * try {
 		 * WordListReader reader =
 		 * // new WordFileWordListReader(this, "words.dat");
 		 * new WebWordListReader(this,
 		 * "http://tompeerdeman.nl/words.xml");
-		 * Log.i("ahd", "Starting word read");
 		 * if(reader.execute(wordDatabase) == null) {
 		 * throw new Exception("Word download failed");
 		 * }
@@ -228,6 +227,16 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * Handle input events from the keyboard. When the game is in lock state or
+	 * the game has been finished this input is ignored. Otherwise this method
+	 * fire's an async task that should call the required methods to handle the
+	 * guess and handle the response.
+	 * 
+	 * @see android.app.Activity#onKeyUp(int, android.view.KeyEvent)
+	 */
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		char guess = (char) Character.toUpperCase(event.getUnicodeChar());
@@ -242,6 +251,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		return super.onKeyUp(keyCode, event);
 	}
 	
+	/**
+	 * Callback from the async task that onKeyUp fired.
+	 * This method updates the visualization of the status and shows the dialogs
+	 * if the game has been won or lost.
+	 * 
+	 * If the game has been won this method inserts the game into the highscore.
+	 */
 	public void onKeyCallback() {
 		showCurrentGuesses();
 		showCurrentWord();
@@ -328,6 +344,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 	
+	/**
+	 * Create a new game.
+	 * This method initializes a new status, and the old status is discarded.
+	 * 
+	 * 
+	 * @param pause
+	 *            Should the "Game paused" dialog be shown.
+	 */
 	private void newGame(boolean pause) {
 		timer.stopTimer();
 		
@@ -342,6 +366,10 @@ public class MainActivity extends Activity implements OnClickListener {
 			timer.startTimer();
 	}
 	
+	/**
+	 * This method resets the visible elements to a state where a fresh game is
+	 * visible.
+	 */
 	public void onReset() {
 		showCurrentWord();
 		showCurrentGuesses();
@@ -369,6 +397,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		statusDrawable.invalidateSelf();
 	}
 	
+	/**
+	 * Update the visible text to show the correct and not yet guessed
+	 * characters
+	 */
 	public void showCurrentWord() {
 		char[] word = game.getStatus().getGuessedChars();
 		char[] newWord = new char[word.length * 2];
@@ -379,6 +411,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		wordView.setText(new String(newWord));
 	}
 	
+	/**
+	 * Update the visible text to show the amount of guesses left.
+	 */
 	public void showCurrentGuesses() {
 		final int maxGuesses = game.getSettings().getMaxNumGuesses();
 		guessesView.setText("Guesses:\n"
@@ -386,6 +421,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				+ maxGuesses);
 	}
 	
+	/**
+	 * Update the visible text to show the time since the game has started.
+	 */
 	public void showCurrentTime() {
 		timeView.setText("Time:\n"
 				+ TIME_FORMAT.format(new Date(game.getStatus().getTime())));
@@ -412,6 +450,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		wordView.requestFocus();
 	}
 	
+	/**
+	 * Show the paused dialog.
+	 * If the game is not finished yet the text "Game paused" is shown
+	 * else the text "Game finished" is shown.
+	 * 
+	 * This method also provides the actions for the dialog buttons.
+	 * 
+	 */
 	private void showPausedDialog() {
 		timer.stopTimer();
 		
@@ -443,6 +489,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		alert.show();
 	}
 	
+	/**
+	 * Write the current game to a file.
+	 */
 	private void writeGameStatus() {
 		ObjectOutputStream objOut = null;
 		try {
@@ -463,6 +512,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 	
+	/**
+	 * Load a game from a file. The loading may fail (if no game is saved), in
+	 * that case nothing is done.
+	 */
 	private void readGameStatus() {
 		ObjectInputStream objIn = null;
 		try {
@@ -488,6 +541,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	/*
 	 * (non-Javadoc)
+	 * 
+	 * Handle the clicks from the "Open keyboard" button 
 	 * 
 	 * @see android.view.View.OnClickListener#onClick(android.view.View)
 	 */

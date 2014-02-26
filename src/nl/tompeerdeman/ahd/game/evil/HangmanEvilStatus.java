@@ -52,6 +52,12 @@ public class HangmanEvilStatus extends HangmanStatus {
 		return wordChosen;
 	}
 	
+	/**
+	 * Check if the given word contains letters previous guessed.
+	 * 
+	 * @param word
+	 * @return True if the word contains previous guessed characters.
+	 */
 	public boolean containsPrevGuessed(String word) {
 		int idx;
 		for(int i = 0; i < nPrevGuessedChars; i++) {

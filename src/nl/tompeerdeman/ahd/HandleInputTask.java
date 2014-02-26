@@ -51,6 +51,7 @@ public class HandleInputTask extends AsyncTask<Character, Void, Void> {
 			dialog.dismiss();
 		}
 		
+		// Call the callback, this should handle the visual aspect.
 		main.onKeyCallback();
 	}
 }

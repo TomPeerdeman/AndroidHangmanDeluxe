@@ -67,7 +67,8 @@ public class SettingsActivity extends Activity implements
 		
 		game = HangmanGame.getInstance();
 		
-		/* Indicate settings changes should not result in a new settings object
+		/*
+		 * Indicate settings changes should not result in a new settings object
 		 * since the statements below cause them to be called as well.
 		 */
 		loaded = false;
@@ -202,6 +203,11 @@ public class SettingsActivity extends Activity implements
 		}
 	}
 	
+	/**
+	 * Generate new settings, this is called when a setting is changed.
+	 * The settings are not reused, a whole new HangmanSettings object is
+	 * created every time.
+	 */
 	private void newSettings() {
 		game.setSettings(new HangmanSettings(
 				(byte) (maxGuessesBar.getProgress() + 1),

@@ -26,7 +26,7 @@ public class HangmanGoodStatus extends HangmanStatus {
 		super(guesses, guessedChars);
 		this.word = word;
 	}
-
+	
 	/**
 	 * Constructor for new game.
 	 * 
@@ -57,8 +57,10 @@ public class HangmanGoodStatus extends HangmanStatus {
 			}
 		}
 	}
-
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see nl.tompeerdeman.ahd.HangmanStatus#getWordChars()
 	 */
 	@Override

@@ -109,7 +109,7 @@ public class EvilGameplay implements GameplayDelegate {
 				
 				EquivalenceClass highClass = null;
 				if(eqClasses.size() > 1) {
-					// Get the class with the lowest score.
+					// Get the class with the highest score.
 					int highScore = 0;
 					for(EquivalenceClass q : eqClasses.values()) {
 						int score = q.getScore(guess);
@@ -125,7 +125,7 @@ public class EvilGameplay implements GameplayDelegate {
 				
 				if(highClass != null) {
 					// Insert the new guess into the old eq class at the
-					// positions of the positions in lowClass.
+					// positions of the positions in highClass.
 					char[] eqArr = evilStatus.getEquivalenceClass();
 					for(int i = 0; i < eqArr.length; i++) {
 						if(highClass.getEqClass().charAt(i) == guess) {
@@ -223,15 +223,31 @@ public class EvilGameplay implements GameplayDelegate {
 			return nWords;
 		}
 		
+		/**
+		 * Get the score of the class. The class with the highest score is
+		 * picked.
+		 * 
+		 * @param guess
+		 * @return The score of this equivalence class.
+		 */
 		public int getScore(char guess) {
-			return (countOccurences(guess) * 40) + (nWords * 10)
+			return (nWords * 5) - (countOccurences(guess) * 40) + 40
 					+ rand.nextInt(10);
 		}
 		
+		/**
+		 * @return The first word found with this eq class
+		 */
 		public String getFirstWord() {
 			return firstWord;
 		}
 		
+		/**
+		 * Count the number of occurrences of needle in this eq class.
+		 * 
+		 * @param needle
+		 * @return
+		 */
 		private int countOccurences(char needle) {
 			return eqClass.length()
 					- eqClass.replaceAll(String.valueOf(needle), "").length();

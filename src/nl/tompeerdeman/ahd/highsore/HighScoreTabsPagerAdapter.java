@@ -28,6 +28,21 @@ public class HighScoreTabsPagerAdapter extends FragmentPagerAdapter {
 	@Override
 	public Fragment getItem(int fragment) {
 		HighScoreFragment frag = new HighScoreFragment();
+		
+		/*
+		 * Tabs are defined in reverse in comparison to the definition in the
+		 * database.
+		 * 
+		 * Database:
+		 * 0: Evil
+		 * 1: Good
+		 * 2. Combined
+		 * 
+		 * Tabs:
+		 * 0: combined
+		 * 1: Good
+		 * 2: Evil
+		 */
 		frag.type = 2 - fragment;
 		return frag;
 	}

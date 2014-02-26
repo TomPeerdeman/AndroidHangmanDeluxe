@@ -54,15 +54,24 @@ public abstract class HighScoresModel implements Serializable {
 		return highScoresNormal;
 	}
 	
+	/**
+	 * Ensure the highscores are loaded.
+	 * If they are not load them.
+	 */
 	public void ensureLoaded() {
 		if(!loaded) {
 			load();
 		}
 	}
 	
+	/**
+	 * Load the highscores.
+	 */
 	protected abstract void load();
 	
 	/**
+	 * Insert a new entry into the highscore.
+	 * 
 	 * @param entry
 	 * @param evil
 	 */

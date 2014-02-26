@@ -24,6 +24,9 @@ public class HangmanGame implements Serializable {
 	
 	private transient GameplayDelegate gameplayDelegate;
 	
+	/**
+	 * @return The single instance of the game
+	 */
 	public static HangmanGame getInstance() {
 		return instance;
 	}

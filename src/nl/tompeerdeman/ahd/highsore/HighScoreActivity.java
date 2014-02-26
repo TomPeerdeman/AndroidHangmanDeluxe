@@ -110,23 +110,34 @@ public class HighScoreActivity extends ActionBarActivity implements
 	@Override
 	public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
 	}
-
-	/* (non-Javadoc)
-	 * @see android.support.v4.view.ViewPager.OnPageChangeListener#onPageScrollStateChanged(int)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.support.v4.view.ViewPager.OnPageChangeListener#
+	 * onPageScrollStateChanged(int)
 	 */
 	@Override
 	public void onPageScrollStateChanged(int arg0) {
 	}
-
-	/* (non-Javadoc)
-	 * @see android.support.v4.view.ViewPager.OnPageChangeListener#onPageScrolled(int, float, int)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.support.v4.view.ViewPager.OnPageChangeListener#onPageScrolled
+	 * (int, float, int)
 	 */
 	@Override
 	public void onPageScrolled(int arg0, float arg1, int arg2) {
 	}
-
-	/* (non-Javadoc)
-	 * @see android.support.v4.view.ViewPager.OnPageChangeListener#onPageSelected(int)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.support.v4.view.ViewPager.OnPageChangeListener#onPageSelected
+	 * (int)
 	 */
 	@Override
 	public void onPageSelected(int pos) {
