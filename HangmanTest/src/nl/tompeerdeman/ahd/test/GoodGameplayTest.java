@@ -29,7 +29,7 @@ public class GoodGameplayTest extends TestCase {
 		
 		@Override
 		public String getRandWordInLengthRange(int minLength, int maxLength) {
-			return "Word with spaces";
+			return "WORD WITH SPACES";
 		}
 		
 		@Override
@@ -54,7 +54,22 @@ public class GoodGameplayTest extends TestCase {
 	 * .
 	 */
 	public void testOnGuess() {
-		// TODO: Implement
+		HangmanSettings settings =
+			new HangmanSettings((byte) 6, 1, 26, false, false);
+		HangmanStatus status = game.initialize(settings, db);
+		assertNotNull(status);
+		assertEquals(status.getRemainingGuesses(), 6);
+		game.onGuess(settings, status, db, 'W');
+		assertEquals(status.getRemainingGuesses(), 6);
+		assertTrue(new String(status.getGuessedChars()).contains("W"));
+		
+		// Ignore double guesses
+		game.onGuess(settings, status, db, 'W');
+		assertEquals(status.getRemainingGuesses(), 6);
+		
+		// Test not correct guess
+		game.onGuess(settings, status, db, 'Q');
+		assertEquals(status.getRemainingGuesses(), 5);
 	}
 	
 	/**
@@ -79,7 +94,7 @@ public class GoodGameplayTest extends TestCase {
 		assertFalse(status.hasLostGame());
 		assertFalse(status.hasWonGame());
 		char[] wordChars = status.getWordChars();
-		String origWord = "Word with spaces";
+		String origWord = "WORD WITH SPACES";
 		assertEquals(wordChars.length, origWord.length());
 		assertTrue(Arrays.equals(wordChars, origWord.toCharArray()));
 		
@@ -87,11 +102,15 @@ public class GoodGameplayTest extends TestCase {
 		Arrays.fill(wordChars, GameplayDelegate.CHARACTER_UNKNOWN);
 		assertTrue(Arrays.equals(status.getGuessedChars(), wordChars));
 		
+		// Test if spaces are revealed
 		status =
 			game.initialize(new HangmanSettings((byte) 6, 1, 26, true, false),
 					db);
 		assertEquals(wordChars.length, origWord.length());
+		assertEquals(wordChars.length, status.getGuessedChars().length);
 		assertFalse(Arrays.equals(status.getGuessedChars(), wordChars));
+		wordChars[4] = ' ';
+		wordChars[9] = ' ';
+		assertTrue(Arrays.equals(status.getGuessedChars(), wordChars));
 	}
-	
 }

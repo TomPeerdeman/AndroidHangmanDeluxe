@@ -52,7 +52,7 @@ public class HangmanGoodStatus extends HangmanStatus {
 	public void revealNonAlpha() {
 		// Find the non alphabetic characters and reveal them.
 		for(int i = 0; i < word.length; i++) {
-			if(word[i] > 'z' || word[i] < 'a') {
+			if(word[i] > 'Z' || word[i] < 'A') {
 				reveal(i, word[i]);
 			}
 		}
