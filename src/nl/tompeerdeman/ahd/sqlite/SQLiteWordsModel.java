@@ -20,7 +20,7 @@ public class SQLiteWordsModel implements WordsModel {
 	private final static String SELECT_RAND_INRANGE =
 		"SELECT word FROM words WHERE word_length BETWEEN ? AND ? ORDER BY RANDOM() LIMIT 1";
 	private final static String SELECT_EQUIVALENT =
-		"SELECT word FROM words WHERE word LIKE ? AND word LIKE ?";
+		"SELECT word FROM words WHERE word_length = ? AND word LIKE ? AND word LIKE ?";
 	private final static String INSERT_WORD =
 		"INSERT INTO words (word, word_length) VALUES (?, ?)";
 	private final static String COUNT_WORDS = "SELECT COUNT(*) FROM words";
@@ -44,7 +44,8 @@ public class SQLiteWordsModel implements WordsModel {
 	public List<String> getEquivalentWords(String like, char contains) {
 		Cursor cursor =
 			db.rawQuery(SELECT_EQUIVALENT,
-					new String[] {like, "%" + String.valueOf(contains) + "%"});
+					new String[] {String.valueOf(like.length()), like,
+									"%" + String.valueOf(contains) + "%"});
 		int count = cursor.getCount();
 		
 		if(count == 0) {

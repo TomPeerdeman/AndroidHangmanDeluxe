@@ -15,6 +15,7 @@ import nl.tompeerdeman.ahd.game.HangmanGame;
 import nl.tompeerdeman.ahd.game.HangmanSettings;
 import nl.tompeerdeman.ahd.game.HangmanStatus;
 import nl.tompeerdeman.ahd.game.WordsModel;
+import android.util.Log;
 
 /**
  * @author Tom Peerdeman
@@ -74,6 +75,7 @@ public class EvilGameplay implements GameplayDelegate {
 				evilStatus.decrementGuesses();
 			}
 		} else {
+			Log.i("ahd-evil", "Start grabbing words");
 			List<String> words =
 				wordDatabase.getEquivalentWords(
 						new String(evilStatus.getEquivalenceClass()), guess);
@@ -156,8 +158,13 @@ public class EvilGameplay implements GameplayDelegate {
 	}
 	
 	private String equivalize(String word, char keep) {
-		return word.replaceAll("[^" + keep + "]",
-				String.valueOf(GameplayDelegate.CHARACTER_UNKNOWN));
+		char[] arr = word.toCharArray();
+		for(int i = 0; i < arr.length; i++) {
+			if(arr[i] != keep) {
+				arr[i] = GameplayDelegate.CHARACTER_UNKNOWN;
+			}
+		}
+		return new String(arr);
 	}
 	
 	/*
